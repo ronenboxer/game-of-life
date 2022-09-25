@@ -1,0 +1,194 @@
+body {
+    text-align: center;
+    background-color: rgb(183, 183, 183);
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+h1 {
+    color: white;
+    margin-top: 40px;
+}
+
+h1 span {
+    color: rgb(106, 150, 252);
+    font-style: italic;
+}
+
+.info {
+    font-size: 20px;
+    color: white;
+    text-align: left;
+    margin-left: 40vw;
+    margin-top: 17px;
+}
+
+.info span {
+    color: rgb(106, 150, 252);
+}
+
+.speed {
+    text-align: center;
+    /* margin-left: 40vw; */
+    /* margin-right: 5px; */
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 22px;
+}
+
+/* .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+} */
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 15px;
+    width: 15px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: #2196F3;
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input span {
+    left: 8px;
+}
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+button {
+    border: 2px solid;
+    width: 180px;
+    padding: 8px;
+    font-size: 20px;
+    margin-left: 10px;
+    margin-bottom: 8px;
+    border-radius: 3px;
+    transition: opacity 100ms;
+    color: rgb(106, 150, 252);
+    background-color: rgb(255, 255, 255);
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+button:active {
+    color: white;
+    background-color: rgb(106, 150, 252);
+}
+
+
+.kill-off {
+    color: rgb(106, 150, 252);
+}
+
+.kill-on {
+    color: white;
+    background-color: rgb(106, 150, 252);
+    /* border: rgb(157, 122, 192); */
+}
+
+.village {
+    text-align: center;
+}
+
+table {
+    text-align: center;
+    margin: auto;
+    margin-top: 20px;
+    border-spacing: 0;
+    border-radius: 1px;
+}
+
+
+
+td,
+tr {
+    border: 0.1px solid rgb(170, 170, 170);
+    margin: none;
+}
+
+td {
+    height: 10px;
+    width: 7px;
+    transition: 50ms;
+    transition: opacity 35ms;
+    transition: 30ms;
+}
+
+td:hover {
+    opacity: 0.7;
+}
+
+.super {
+    background-color: rgb(106, 150, 252);
+}
+
+.living {
+    background-color: rgb(70, 217, 90);
+}
+
+.born {
+    background-color: rgb(255, 234, 116);
+}
+
+.dying {
+    background-color: rgb(255, 130, 134);
+}
+
+.dead {
+    background-color: rgb(44, 44, 44);
+}
+
+h3 span{
+    position: absolute;
+    top: 240px;
+}
+
+.vertical-switch {
+    left: 30%;
+}
+
+.horizontal-switch {
+    right: 30%
+}

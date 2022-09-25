@@ -1,0 +1,41 @@
+<html>
+
+<head>
+    <title>Game of life</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+    <h1>Game of <span>life</span></h1>
+    <div class="btns-container">
+        <button class="start" onclick="onToggleGame(this)">Start</button>
+        <button onclick="onRandom()">Random?</button>
+        <button onclick="onClearBoard()">Clear</button>
+        <br>
+        <button class="kill-off" onclick="onKillMode(this)">Kill neighbours</button>
+        <button onclick="onSave()">Save</button>
+        <button class="load" onclick="onLoad()">Load</button>
+    </div>
+    <div class="control">
+        <input class="speed" type="range" min="5" max="2000" onchange="onChangeSpeed(this)">
+        <label for="speed">Speed 50%</label><br><br>
+        <label class="switch verticlal">
+            <input type="checkbox" onchange="onChangeVerBorder()">
+            <span class="slider round"></span>
+        </label>
+        <label class="switch horizontal" onchange="onChangeHorBorder()">
+            <input type="checkbox">
+            <span class="slider round"></span>
+        </label>
+        <h3>
+            <span class="vertical-switch">Vertical closed circle</span>
+            <span class="horizontal-switch">Horizontal closed circle</span>
+        </h3>
+    </div>
+    <div class="info">Alive: <span></span></div>
+    <div class="info">Generation: <span></span></div>
+    <div class="village"></div>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
