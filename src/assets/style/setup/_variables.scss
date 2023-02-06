@@ -1,0 +1,220 @@
+// Layout
+$layout-margin: 20px;
+$header-height: 60px;
+$footer-height: 60px;
+
+// Breakpoints
+$mobile-breakpoint: 460px;
+$narrow-breakpoint: 720px;
+$normal-breakpoint: 960px;
+
+// Palette
+    // Blacks
+$ultra-black: #000000;
+$dark-black: #141414;
+$medium-black: #1B1B1B;
+$plain-black: #242424;
+$blackish: #333333;
+$doom-black: #3c3c3c;
+$soft-black: #4d4d4d;
+$light-black: #565656;
+
+    // Whites
+$ultra-white: #ffffff;
+$subtle-white: #f6f6f6;
+$concrete-white: #ececec;
+$whitish: #e1e1e1;
+$ceramic-white: #dbdbdb;
+$grayish: #d0d0d0;
+
+    // Grays
+$winter: #9aadbd;
+$explosive: #c4c4c4;
+$american-gray: #808080;
+$dark-gray: #373737;
+$desert: #a9aba3;
+$clay-gray: #9e9e9e;
+$blue-gray: #989fa7;
+$toned-gray: #8d8c86;
+$ceramic-gray: #c1c1c3;
+$cloudy: #828385;
+$indigo-gray: #79828d;
+$chili-gray: #5d5e61;
+
+    // Browns
+$light-brown: #ac977a;
+$coffee: #BD816E;
+$brown: #7f5347;
+$muddy: #553e3d;
+$pecan: #563E3E;
+$merlot: #2f0e10;
+$dark-brown: #410f10;
+$brownish: #541a17;
+$clay: #642720;
+$light-clay: #75362a;
+$caramel: #874735;
+$earth: #4a2b16;
+$tree-trunk: #5a3a28;
+
+    // Reds
+$stuck-red: #e2445c;
+$dark-red: #bb3354;
+$rose: #d50000;
+$strawberry: #ff1744;
+$watermelon: #ff5252;
+$lipstick: #b71c1c;
+$cherry: #c62828;
+$lollipop: #d32f2f;
+$bloody: #e53935;
+$ketchup: #f44336;
+$reddish: #ef5350;
+$nordic: #e57373;
+$body: #ef9494;
+$weak-red: #ffcdd2;
+
+    // Pinks
+$sophia-pink: #ff158a;
+$dark-pink: #fe5bc4;
+$pink: #d973b0;
+$burduex: #9e0938;
+$bit-pink: #a40842;
+$fuchsia: #af104f;
+$dark-pink: #b82462;
+$bubble-gum: #c1396d;
+$grapy: #ca497d;
+$pinky: #d05e8c;
+$pinkish: #d9729c;
+$light-pink: #e087ad;
+$baby-pink: #eb9fc0;
+$light-pink: #f6b7d4;
+
+    // Oranges
+$orange: #ff642e;
+$sunset: #ff7575;
+$peach: #ffadad;
+$blood-orange: rgb(133,23,23);
+$am-i-red: rgb(172,36,30);
+$orangish: rgb(212,58,29);
+$dark-orange: rgb(237,84,32);
+$light-orange: rgb(241,121,72);
+$white-skin: rgb(247,155,113);
+$albino: rgb(247,186,151);
+
+    // Yellows
+$egg-yolk: #ffcb00;
+$yellowest: #ffd900;
+$yellow: #ffe033;
+$saladish: #cab641;
+$yellow: #fdab3d;
+$mustard: #ebb514;
+$honey: #efc443;
+$daisy: #efe06f;
+$light-yellow: #fff099;
+
+    // Greens
+$grass-green: #037f4c;
+$green-haze: #00a359;
+$jade: #03c875;
+$light-green: #9cd326;
+$dark-sea-weed: #143319;
+$sea-weed: #1e4d26;
+$bottle-green: #286632;
+$olive: #32803f;
+$green: #3c9a4c;
+$greenish: #46b358;
+$light-green: #5dbf6e;
+$melon: #77c985;
+$mint: #90d49c;
+$fresh-green: #aadeb3;
+$brownish-green: #3d4525;
+$metallic-green: #66743e;
+$leafy: #8fa257;
+$therapeutic: #aebc84;
+$baby-green: #cdd5b2;
+
+    // Tourquises
+$teal: #175A63;
+$aquamarine: #4eccc6;
+$darkest-teal: #2f3b35;
+$money-green: #3f4f46;
+$dirty-green: #4f6258;
+$metallic-green: #5f766a;
+$martini-green: #6f8a7b;
+$sand-green: #829a8d;
+$finish-green: #96aa9f;
+$gray-green: #aabab1;
+$light-gray-green: #becac3;
+
+    // Blues
+$river: #68a1bd;
+$light-blue: #579bfc;
+$dark-blue: #0086c0;
+$navy: #225091;
+$royal: #2B76E5;
+$chili-blue: #66ccff;
+$torquise: #a1e2f7;
+$midnight-sky: #0d245d;
+$ever-blue: #173c9b;
+$ideal-blue: #1b48ba;
+$power-blue: #2054d9;
+$vital0blue: #3b6ae1;
+$neutral-blue: #5a82e6;
+$deep-sea-blue: #0c425f;
+$blueish: #10587e;
+$light-blueish: #146e9e;
+$moist-blue: #1884be;
+$summer-blue: #1c9bdd;
+$sky: #37a9e5;
+$optimistic-blue: #57b7e9;
+$baby-blue: #96d2f1;
+
+    // Purples
+$berry: #7e3b8a;
+$lavander: #bda8f9;
+$purple: #a25ddc;
+$dark-purple: #794bd1;
+$indigo: #5559df;
+$dark-indigo: #401694;
+$steel: #a9bee8;
+$bubble: #faa1f1;
+$dark-eggplant: #612d4c;
+$light-eggplant: #79395f;
+$grape: #914472;
+$plum: #aa4f85;
+$light-plum: #b76696;
+$pinky-purple: #c27ea7;
+$dark-space-purple: #503d75;
+$space-purple: #7055a4;
+$light-space-purple: #836bb1;
+$ivvone-purple: #9783be;
+$foggy-purple: #aa9aca;
+$dark-violet: #2b1a50;
+$violet: #39236b;
+$light-violet: #482b86;
+$hard-purple: #5634a1;
+$medium-purple: #653dbc;
+$soft-purple: #7955c7;
+$petunia: #8e70d0;
+$caprice-purple: #471f6e;
+$light-aubergine: #59278a;
+$dark-fizzy-purple: #6b2fa6;
+$light-fizzy-purple: #7c37c2;
+$dark-lilac: #8e50cc;
+$lilac: #a06cd4;
+$light-lilac: #b288dc;
+
+    // Burduexes
+$sauvignon: #501a2e;
+$sira: #6b223d;
+$rose-vino: #862b4c;
+$cherry-blossom: #a1345c;
+$jello: #bc3d6b;
+$red-onion: #c8557f;
+$paprika: #d07093;
+$dark-maple: #791516;
+$light-maple: #971a1b;
+$mahogany: #b62021;
+$tomato: #d42526;
+$saucy-red: #dd4041;
+$dark-reddish: #e25e5f;
+$light-reddish: #e87c7d;

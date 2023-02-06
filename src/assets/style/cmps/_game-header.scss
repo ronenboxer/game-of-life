@@ -1,0 +1,221 @@
+$menu-width: 150px;
+$hover-color: $dirty-green;
+
+.game-header {
+    width: 100vw;
+    z-index: 7;
+    background-color: $medium-black;
+    color: $whitish;
+    // background: linear-gradient(90deg, $dark-black 21%, $dark-black 41%, $teal 80%);
+    background-color: transparent;
+    font-size: 1.2rem;
+    font-family: 'Dosis', 'Roboto', 'san-serif';
+
+    .gallery-cell {
+        width: 100%;
+    }
+
+    .app-nav {
+        gap: 20px;
+        height: 3em;
+        margin-top: 12px;
+    }
+
+    .game-control {
+        margin-top: 12px;
+        gap: 20px;
+        padding-bottom: 20px;
+
+
+        button {
+            $btn-clr: $whitish;
+            cursor: pointer;
+            padding: 0.35em 1em;
+            height: 2.24rem;
+            border: 0.15em solid $btn-clr;
+            border-radius: 0.45em;
+            background: none;
+            perspective: 2em;
+            -webkit-box-shadow: inset 0px 0px 0.5em 0px $btn-clr,
+                0px 0px 0.5em 0px $btn-clr;
+            -moz-box-shadow: inset 0px 0px 0.5em 0px $btn-clr,
+                0px 0px 0.5em 0px $btn-clr;
+            box-shadow: inset 0px 0px 0.5em 0px $btn-clr,
+                0px 0px 0.5em 0px $btn-clr;
+
+            &.controller {
+                border-radius: 50%;
+                width: 32px;
+                height: 32px;
+                padding: 4px;
+                &::after{
+                    border-radius: 50%;
+                }
+                &:disabled{
+                    cursor: not-allowed;
+                }
+            }
+
+            &.wide {
+                width: 120px;
+            }
+
+            &.active * {
+                color: $teal;
+            }
+
+            >* {
+                color: $btn-clr;
+                font-size: 1.2rem;
+                -webkit-text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3),
+                    0 0 0.45em $btn-clr;
+                -moz-text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3),
+                    0 0 0.45em $btn-clr;
+                text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em $btn-clr;
+            }
+
+            &:disabled {
+                border: 0.15em solid $american-gray;
+
+                -webkit-box-shadow: inset 0px 0px 0.5em 0px $american-gray,
+                    0px 0px 0.5em 0px $american-gray;
+                -moz-box-shadow: inset 0px 0px 0.5em 0px $american-gray,
+                    0px 0px 0.5em 0px $american-gray;
+                box-shadow: inset 0px 0px 0.5em 0px $american-gray,
+                    0px 0px 0.5em 0px $american-gray;
+
+                &::before {
+                    background: none;
+                }
+            }
+
+
+
+            &::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                opacity: 0;
+                z-index: -1;
+                background-color: $btn-clr;
+                box-shadow: 0 0 2em 0.2em $btn-clr;
+                transition: opacity 100ms linear;
+            }
+
+            &:hover:not(:disabled)>* {
+                color: $teal;
+                text-shadow: none;
+                animation: none;
+            }
+
+            &:hover:not(:disabled) {
+
+                &::before {
+                    content: "";
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    opacity: 0.7;
+                    filter: blur(1em);
+                    transform: translateY(120%) rotateX(95deg) scale(1, 0.35);
+                    background: $btn-clr;
+                    pointer-events: none;
+                    filter: blur(1.5em);
+                    opacity: 1;
+                }
+
+                &::after {
+                    opacity: 1;
+                }
+            }
+        }
+
+
+        .play-pause {
+            background: #222;
+            width: 1.6rem;
+
+            svg {
+                transform: scale(calc(22 / 104));
+                top: -37.5px;
+                left: -37.5px;
+                color: $aquamarine;
+                margin: 0px auto;
+                display: block;
+                overflow: visible;
+            }
+
+            #circle {
+                transition: stroke-dashoffset 300ms ease-in;
+                stroke-dashoffset: 0;
+                fill: none;
+            }
+
+            #circle.play {
+                stroke-dashoffset: 314;
+            }
+        }
+    }
+
+    .save-header {
+        label {
+            margin-inline-end: 12px;
+        }
+
+        input {
+            outline: none;
+            border: none;
+            border-bottom: .6px solid $whitish;
+            color: $teal;
+            font-size: inherit;
+            background: none;
+            padding-block: 3px;
+            margin-inline-end: 12px;
+        }
+    }
+
+    .save-header,
+    .load-header {
+        margin-top: 20px;
+
+        button {
+            @include transparent(inherit);
+            cursor: pointer;
+            font-size: inherit;
+
+            &:not(.cancel-button) {
+                margin-right: 12px;
+            }
+
+            &:hover {
+                color: $teal;
+                background-color: $whitish;
+            }
+
+            &.submit-button {
+                padding-block: 6px;
+            }
+
+            &.cancel-button {
+                padding: 6px;
+                top: 20px;
+                right: $layout-margin;
+                font-size: 1.475rem;
+            }
+
+            &.positioned {
+                background-color: $whitish;
+                color: $teal;
+
+                &:hover {
+                    opacity: .8;
+                }
+            }
+        }
+    }
+}

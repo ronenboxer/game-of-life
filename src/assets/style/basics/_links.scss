@@ -1,0 +1,13 @@
+a, .link{
+    color: inherit;
+    cursor: pointer;
+
+    &:hover{
+        text-decoration: underline;
+    }
+
+    &:visited{
+        color: inherit;
+    }
+
+}

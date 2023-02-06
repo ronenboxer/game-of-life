@@ -1,0 +1,73 @@
+* {
+    box-sizing: border-box;
+}
+
+::selection {
+    // background-color: $clr1;
+    // color: $clr6;
+}
+
+html {
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    // color: $clr2;
+}
+
+body {
+    font-size: rem(16px);
+    font-family: 'Roboto', sans-serif;
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    font-size: 14px;
+    letter-spacing: 2px;
+    line-height: 1.2;
+    background: $dark-black;
+    background: linear-gradient(135deg, $dark-black 17%, $dark-black 34%, $violet 55%, $teal 80%);
+}
+
+.App {
+    width: 100vw;
+    height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    // margin: 0 0 0.6em;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+}
+
+
+section,
+main,
+footer,
+div,
+header,
+nav,
+p {
+    padding: 0;
+    margin: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+button {
+    font-family: dosis;
+}

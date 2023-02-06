@@ -1,0 +1,151 @@
+// Font Sizes
+.fs12 {
+    font-size: rem(12px);
+}
+
+.fs14 {
+    font-size: rem(14px);
+}
+
+.fs18 {
+    font-size: rem(18px);
+}
+
+.fs20 {
+    font-size: rem(20px);
+}
+
+.fs24 {
+    font-size: rem(24px);
+}
+
+.fs28 {
+    font-size: rem(28px);
+}
+
+.fs30 {
+    font-size: rem(30px);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.hidden{
+    display: none;
+}
+
+.flex {
+
+    display: flex;
+
+    // >*.full {
+    //     flex: 1;
+    // }
+
+    &.column {
+        flex-direction: column;
+    }
+
+    &.justify-center {
+        justify-content: center;
+    }
+
+    &.align-center {
+        align-items: center;
+    }
+
+    &.center {
+        justify-content: center;
+        align-items: center;
+    }
+
+    .dropdown-item{align-self: center;}
+    &.evenly {
+        justify-content: space-evenly;
+    }
+
+    &.around {
+        justify-content: space-around;
+    }
+
+    &.between {
+        justify-content: space-between;
+    }
+
+    &.wrap{
+        flex-wrap: wrap;
+    }
+}
+
+.block{
+    display: block;
+}
+
+.inline-block{
+    display: inline-block;
+}
+
+.inline{
+    display: inline;
+}
+
+.absolute {
+    position: absolute;
+}
+
+.relative {
+    position: relative;
+}
+
+.fixed {
+    position: fixed;
+}
+
+.sticky {
+    position: sticky;
+}
+
+.absolute,
+.relative,
+.fixed,
+.sticky {
+    &.center {
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+.capitalize{
+    text-transform: capitalize
+}
+
+.upper{
+    text-transform: uppercase;
+}
+
+.lower {
+    text-transform: lowercase;
+}
+
+.clean-list{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+
+// Media helpers
+
+.square-ratio {
+    @include aspect-ratio(1, 1);
+}
+
+.video-ratio {
+    @include aspect-ratio(16, 9);
+}
+
+.portrait-ratio {
+    @include aspect-ratio(9, 16);
+}

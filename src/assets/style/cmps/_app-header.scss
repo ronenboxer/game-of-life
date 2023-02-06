@@ -1,0 +1,14 @@
+.app-nav {
+
+    width: 100vw;
+    z-index: 7;
+    background-color: $medium-black;
+    color: $whitish;
+    background-color: transparent;
+    font-size: 1.2rem;
+    font-family: 'Dosis', 'Roboto', 'san-serif';
+
+        gap: 20px;
+        height: 3em;
+        margin-top: 12px;
+    }

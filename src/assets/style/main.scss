@@ -1,0 +1,25 @@
+// Setup
+@import "./setup/variables";
+@import "./setup/functions";
+@import "./setup/mixins";
+@import "./setup/typography";
+@import "./setup/animations";
+
+// Basics
+@import "./basics/helpers";
+@import "./basics/layout";
+@import "./basics/base";
+@import "./basics/links";
+
+// Components
+@import "./cmps/game-header";
+@import "./cmps/app-header";
+@import "./cmps/menu-icon";
+@import "./cmps/aside";
+@import "./cmps/shape-list";
+@import "./cmps/shape-preview";
+@import "./cmps/menu-icon";
+@import "./cmps/logo";
+
+// Pages
+@import "./pages/board";

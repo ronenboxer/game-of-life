@@ -1,0 +1,113 @@
+.app-logo {
+  $size: 2em;
+  height: 100%;
+  width: $size;
+
+  $logo-black: $dark-black;
+  
+  .heart {
+    width: $size;
+    height: 100%;
+    font-size: 1.5em;
+    align-items: center;
+    justify-content: center;
+    svg {
+      -webkit-animation: heartbeat 2s infinite;
+      -moz-animation: heartbeat 2s infinite;
+      -o-animation: heartbeat 2s infinite;
+      animation: heartbeat 2s infinite;
+      color: white;
+    }
+    
+  }
+  
+  .heart-rate {
+    height: $size;
+    width: $size;
+    align-items: center;
+    justify-content: center;
+    $background: white;
+    $color: $logo-black;
+    color: $color;
+    top: 0%;
+    left: -127.5%;
+    
+    svg {
+      transform: scale(.225);
+      width: 150px;
+      height: 54.73px;
+
+      polyline {
+        stroke-dasharray: 80 200;
+        animation: dash 1s linear infinite;
+      }
+    }
+  }
+
+  @keyframes dash {
+    from {
+      stroke-dashoffset: 280;
+    }
+
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @-webkit-keyframes heartbeat {
+    0% {
+      -webkit-transform: scale(1)
+    }
+
+    50% {
+      -webkit-transform: scale(1.4)
+    }
+
+    100% {
+      -webkit-transform: scale(1)
+    }
+  }
+
+  @-moz-keyframes heartbeat {
+    0% {
+      -moz-transform: scale(1)
+    }
+
+    50% {
+      -moz-transform: scale(1.4)
+    }
+
+    100% {
+      -moz-transform: scale(1)
+    }
+  }
+
+  @-o-keyframes heartbeat {
+    0% {
+      -o-transform: scale(1)
+    }
+
+    50% {
+      -o-transform: scale(1.4)
+    }
+
+    100% {
+      -o-transform: scale(1)
+    }
+  }
+
+  @keyframes heartbeat {
+    0% {
+      transform: scale(1)
+    }
+
+    50% {
+      transform: scale(1.4)
+    }
+
+    100% {
+      transform: scale(1)
+    }
+  }
+
+}

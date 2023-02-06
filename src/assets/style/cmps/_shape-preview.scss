@@ -1,0 +1,295 @@
+.side-bar {
+    .dropdown-menu {
+        .saved-shape {
+            padding-block: 30px 50px;
+            color: $blackish;
+            transition: max-height ease-in-out .6s, padding ease-in-out .6s, opacity ease-in .5s;
+            max-height: 400px;
+            overflow: hidden;
+
+            &.deleted{
+                max-height: 0;
+                padding-block: 0;
+                opacity: 0;
+            }
+
+            .shape-header {
+                width: 100%;
+                height: 36px;
+
+                h2 {
+                    width: 100%;
+                    text-align: center;
+                }
+            }
+
+            .options {
+                gap: 5px;
+                margin-bottom: 12px;
+
+                >* {
+                    font-size: 1.2rem;
+                    width: 1.44rem;
+                    height: 1.44rem;
+                    cursor: pointer;
+
+                    &:hover {
+                        color: $teal;
+                    }
+                }
+
+                .delete-trigger-container {
+                    &:has(.delete-trigger:checked) {
+                        pointer-events: none;
+                    }
+
+                    &:hover {
+
+                        .lid,
+                        .lid:before,
+                        .box,
+                        .bin-lines,
+                        .bin-lines::before,
+                        .bin-lines::after {
+                            border-color: $teal;
+                        }
+                    }
+
+                    .bin-icon {
+                        width: 42px;
+                        height: 58px;
+                        margin: 0 auto 0 auto;
+                        border-radius: 50%;
+                        z-index: 2;
+
+                        transform: scale(.3);
+
+                        .lid {
+                            position: relative;
+                            width: 52px;
+                            height: 4px;
+                            left: -1.2px;
+                            border-radius: 4px;
+
+                            &::before {
+                                content: "";
+                                position: absolute;
+                                top: -4px;
+                                right: 0;
+                                left: 0;
+                                width: 10px;
+                                height: 6px;
+                                margin: 0 auto;
+                                border-radius: 10px 10px 0 0;
+                            }
+                        }
+
+
+
+                        .box {
+                            position: relative;
+                            height: 58px;
+                            margin-top: 2px;
+                            border-radius: 0 0 8px 8px;
+                            width: fit-content;
+
+                            .box-inner {
+                                position: relative;
+                                top: 4px;
+                                width: 38px;
+                                height: 44px;
+                                margin: 0 3px;
+                                background-color: transparent;
+                                border: 3px solid $blackish;
+                                border-radius: 0 0 5px 5px;
+
+                                .bin-lines {
+                                    position: relative;
+                                    top: 3.5px;
+                                    margin: 0 auto;
+                                    
+                                    &:before,
+                                    &:after {
+                                        content: "";
+                                        position: absolute;
+                                    }
+                                    
+                                    &:before {
+                                        left: -10px;
+                                    }
+                                    
+                                    &:after {
+                                        left: 10px;
+                                    }
+                                }
+                                
+                                .bin-lines,
+                                .bin-lines::before,
+                                .bin-lines::after {
+                                    background-color: $blackish;
+                                    width: 3px;
+                                    height: 30px;
+                                    border-radius: 1.5px;
+                                    border: none;
+                                }
+                            }
+                        }
+                    }
+
+                    .lid,
+                    .lid:before{
+                        background-color: $blackish;
+                    }
+
+
+                    .box,
+                    .bin-lines,
+                    .bin-lines::before,
+                    .bin-lines::after {
+                        background-color: transparent;
+                        border: 3px solid $blackish;
+                        // background-color: $blackish;
+                        transition: 0.2s ease background-color;
+                    }
+
+                    .delete-trigger:checked~.bin-icon .lid,
+                    .delete-trigger:checked~.bin-icon .lid:before,
+                    .delete-trigger:checked~.bin-icon .box,
+                    .delete-trigger:checked~.bin-icon .box-inner {
+                        // background-color: #fff;
+                    }
+
+                    .delete-trigger:checked~.bin-icon .bin-lines,
+                    .delete-trigger:checked~.bin-icon .bin-lines:before,
+                    .delete-trigger:checked~.bin-icon .bin-lines:after {}
+
+                    .delete-trigger:checked~.bin-icon {
+
+                        .box-inner,
+                        .box {
+                            border-color: $teal;
+                        }
+                        
+                        .lid,
+                        .lid::before,
+                        .bin-lines,
+                        .bin-lines::before,
+                        .bin-lines::after{
+                            background-color: $teal;
+                        }
+                    }
+
+                    .delete-trigger:checked~.bin-icon {
+                        // animation: vanish 0.8s ease 0.4s forwards;
+                    }
+
+                    .delete-trigger:checked+.bin-icon .box {
+                        animation: shake 0.2s ease 0.1s;
+                    }
+
+                    .delete-trigger:checked+.bin-icon .lid {
+                        animation: lift-up 0.8s ease 0.1s, shake_u 0.8s ease 0.1s,
+                            shake_l 0.2s ease 0.8s;
+                    }
+
+                    .delete-trigger:checked~.layer {
+                        width: 226px;
+                        height: 226px;
+                    }
+                }
+            }
+
+            canvas {
+                box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+                cursor: pointer;
+
+                &:hover {
+                    opacity: .8;
+                }
+            }
+        }
+    }
+
+    @keyframes shake {
+        0% {
+            transform: rotateZ(3deg);
+        }
+
+        25% {
+            transform: rotateZ(0);
+        }
+
+        75% {
+            transform: rotateZ(-3deg);
+        }
+
+        100% {
+            transform: rotateZ(0);
+        }
+    }
+
+    @keyframes lift-up {
+        0% {
+            top: 0;
+        }
+
+        50% {
+            top: -35px;
+        }
+
+        100% {
+            top: 0;
+        }
+    }
+
+    @keyframes shake_u {
+        0% {
+            transform: rotateZ(0);
+        }
+
+        25% {
+            transform: rotateZ(-15deg);
+        }
+
+        50% {
+            transform: rotateZ(0deg);
+        }
+
+        75% {
+            transform: rotateZ(15deg);
+        }
+
+        100% {
+            transform: rotateZ(0);
+        }
+    }
+
+    @keyframes shake_l {
+        0% {
+            transform: rotateZ(0);
+        }
+
+        80% {
+            transform: rotateZ(3deg);
+        }
+
+        90% {
+            transform: rotateZ(-3deg);
+        }
+
+        100% {
+            transform: rotateZ(0);
+        }
+    }
+
+    @keyframes vanish {
+        from {
+            opacity: 1;
+        }
+
+        to {
+            opacity: 0;
+            display: none;
+        }
+    }
+}

@@ -1,25 +1,45 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useState } from 'react';
+
+import { Board } from './pages/board';
+import { About } from './pages/about';
+import { NavLink, Route, Routes } from 'react-router-dom';
+import { Logo } from './cmps/logo';
 
 function App() {
+
+  const listenersMap: { [key: string]: Function[] } = {}
+  const [isMenuActive, setIsMenuActive] = useState(false)
+
+  function createEventEmitter() {
+    return {
+      on(evName: string, listener: Function) {
+        listenersMap[evName] = (listenersMap[evName]) ? [...listenersMap[evName], listener] : [listener]
+        return () => {
+          listenersMap[evName] = listenersMap[evName].filter((func: Function) => func !== listener)
+        }
+      },
+      emit(evName: string, data: unknown) {
+        if (!listenersMap[evName]) return
+        listenersMap[evName].forEach((listener: Function) => listener(data))
+      }
+    }
+  }
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <main className="App flex column">
+
+      <nav className="app-nav main-layout flex align-center">
+        <Logo />
+        <NavLink to="/about">About</NavLink>
+        <span>Instructions</span>
+
+      </nav>
+      <Routes>
+        <Route path="/about" element={<About />} />
+        <Route path="/" element={<Board eventBus={createEventEmitter} />} />
+      </Routes>
+    </main>
   );
 }
 
