@@ -2,8 +2,9 @@ import { useState } from 'react';
 
 import { Board } from './pages/board';
 import { About } from './pages/about';
-import { NavLink, Route, Routes } from 'react-router-dom';
+import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
 import { Logo } from './cmps/logo';
+import { Instructions } from './pages/instructions';
 
 function App() {
 
@@ -32,12 +33,14 @@ function App() {
       <nav className="app-nav main-layout flex align-center">
         <Logo />
         <NavLink to="/about">About</NavLink>
-        <span>Instructions</span>
+        <NavLink to="instructions">Instructions</NavLink>
 
       </nav>
       <Routes>
+        <Route path="/instructions" element={<Instructions />} />
         <Route path="/about" element={<About />} />
         <Route path="/" element={<Board eventBus={createEventEmitter} />} />
+        <Route path="*" element={<Navigate to="/"/>} />
       </Routes>
     </main>
   );

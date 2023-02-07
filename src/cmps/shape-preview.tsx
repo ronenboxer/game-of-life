@@ -32,9 +32,10 @@ export function ShapePreview({ type, idx, shape, name, eventBus, maxWidth, gReso
         const ctx = canvas.getContext('2d')
         if (!ctx) return
         const calcCellWidth = maxWidth / shape.size[1]
-        const resolution = calcCellWidth > gResolution
+        const calcCellHeight = maxWidth / shape.size[0]
+        const resolution = Math.min(calcCellWidth, calcCellHeight) > gResolution
             ? gResolution
-            : calcCellWidth
+            : Math.min(calcCellWidth, calcCellHeight)
         canvas.width = resolution * shape.size[1]
         canvas.height = resolution * shape.size[0]
 
@@ -59,7 +60,7 @@ export function ShapePreview({ type, idx, shape, name, eventBus, maxWidth, gReso
     useEffect(() => {
         if (!canvasRef?.current) return
         renderCanvas(canvasRef.current)
-    }, [canvasRef.current])
+    }, [canvasRef.current, shape])
 
     eventBus().on('onTransformShape', onTransformShape)
     eventBus().on('deleteSavedShape', ({ type: typeToDelete, idx: idxToDelete, name: nameToDelete }: { type: string, name: string, idx: number }) => {

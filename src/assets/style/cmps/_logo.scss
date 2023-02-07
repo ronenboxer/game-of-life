@@ -5,6 +5,11 @@
 
   $logo-black: $dark-black;
   
+  &:hover{
+    .heart svg{
+      color: $teal;
+    }
+  }
   .heart {
     width: $size;
     height: 100%;
@@ -16,7 +21,7 @@
       -moz-animation: heartbeat 2s infinite;
       -o-animation: heartbeat 2s infinite;
       animation: heartbeat 2s infinite;
-      color: white;
+      color: $whitish;
     }
     
   }
@@ -26,7 +31,7 @@
     width: $size;
     align-items: center;
     justify-content: center;
-    $background: white;
+    $background: $whitish;
     $color: $logo-black;
     color: $color;
     top: 0%;

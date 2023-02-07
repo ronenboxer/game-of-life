@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import boardService, { Shape, Shapes } from "../services/board.service";
+import { useEffect, useRef } from "react";
+import { Shapes } from "../services/board.service";
 import { ShapePreview } from "./shape-preview";
 
 interface ShapeListProps {
@@ -20,58 +20,16 @@ export function ShapeList({ type, shapes, onTransformShape, eventBus, gResolutio
         board: 'My boards'
     }
     const CANVAS_PADDING = 22
-    const canvasRefs = useRef([] as HTMLCanvasElement[])
-
-    function clearCanvas(canvas: HTMLCanvasElement) {
-        if (!canvas) return
-        const currCtx = canvas.getContext('2d')
-        currCtx?.clearRect(0, 0, canvas.width, canvas.height)
-    }
 
     function expandMenu() {
         const shapeList = shapeListRef.current!
         shapeList.classList.toggle('expanded')
         if (!shapeList.classList.contains('expanded')) return
         eventBus().emit('reloadShapes', type)
-        const canvases = canvasRefs.current
-        if (!canvases) return
-        canvases.forEach(canvas => {
-            const name = canvas.dataset.name || ''
-            renderSavedShape(canvas, name)
-        })
     }
 
-    function renderSavedShape(canvas: HTMLCanvasElement, name: string) {
-        clearCanvas(canvas)
-        const ctx = canvas.getContext('2d')
-        if (!ctx || !shapeListRef?.current) return
-        const shape = shapes[name]
-        const totalWidth = shapeListRef!.current.offsetWidth - 2 * CANVAS_PADDING
-        const calcCellWidth = totalWidth / shape.size[1]
-        const resolution = calcCellWidth > gResolution
-            ? gResolution
-            : calcCellWidth
-        canvas.width = resolution * shape.size[1]
-        canvas.height = resolution * shape.size[0]
-
-        let cellIdx = 0
-        for (let row = 0; row < shape.size[0]; row++) {
-            for (let col = 0; col < shape.size[1]; col++) {
-                const currCell = cellIdx >= shape.cells.length ? null : shape.cells[cellIdx]
-                ctx.beginPath()
-                if (currCell && row === currCell.coords[0] && col === currCell.coords[1]) {
-                    ctx.fillStyle = boardService.getCurrColor(currCell.state)
-                    cellIdx++
-                } else ctx.fillStyle = boardService.getCurrColor('dead')
-
-                ctx.rect(col * resolution, row * resolution, resolution, resolution)
-                ctx.lineWidth = .5
-                ctx.stroke()
-                ctx.fill()
-            }
-        }
-    }
-
+    useEffect(() => {
+    }, [shapes])
     eventBus().on('menuToggled', () => shapeListRef.current?.classList.remove('expanded'))
 
     return (

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import boardService, { Shape, Shapes } from "../services/board.service"
 import { MenuIcon } from "./menu-icon"
 import { ShapeList } from "./shape-list"
@@ -29,7 +29,7 @@ export function Aside({ eventBus }: { eventBus: Function }) {
     const [rangeVals, setRangeVals] = useState({ speed: 20, population: 22, resolution: 44 })
     const [gResolution, setResolution] = useState(40)
 
-    function toggleMenuActive() { 
+    function toggleMenuActive() {
         setIsMenuActive(!isMenuActive)
         eventBus().emit('menuToggled', null)
     }
@@ -63,6 +63,10 @@ export function Aside({ eventBus }: { eventBus: Function }) {
             return { ...prevShapes }
         })
     }
+
+    useEffect(() => { 
+        // console.log('123123')
+    }, [shapesObj])
 
     eventBus().on('onSaveEvent', onLoadShapes)
     eventBus().on('onSaveMode', () => setIsMenuActive(false))
@@ -105,7 +109,7 @@ export function Aside({ eventBus }: { eventBus: Function }) {
                         onChange={() => onSetRange(type)} />
                     <span className="range-slider__value">{rangeVals[type as keyof typeof rangeVals] + '%'}</span>
                 </div>)}
-                {['factory', 'shape', 'board'].map((type, idx) => <ShapeList key={idx + ':' + type} {...{ eventBus, type, onTransformShape }} shapes={shapesObj[type as keyof typeof shapesObj]} gResolution={gResolution} />)}
+                {Object.keys(shapesObj).map((type, idx) => <ShapeList key={idx + ':' + type} {...{ eventBus, type, onTransformShape }} shapes={shapesObj[type as keyof typeof shapesObj]} gResolution={gResolution} />)}
             </aside >
         </section>
     )
