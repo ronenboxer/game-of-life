@@ -30,6 +30,7 @@ export function ShapeList({ type, shapes, onTransformShape, eventBus, gResolutio
 
     useEffect(() => {
     }, [shapes])
+    
     eventBus().on('menuToggled', () => shapeListRef.current?.classList.remove('expanded'))
 
     return (

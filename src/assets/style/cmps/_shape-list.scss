@@ -3,6 +3,7 @@
     .item-title {
         cursor: pointer;
         transition: ease-in-out .5s !important;
+        font-weight: 500;
 
         &:hover{
             color: $teal;

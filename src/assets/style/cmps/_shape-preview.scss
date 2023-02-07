@@ -7,7 +7,7 @@
             max-height: 4000px;
             overflow: hidden;
 
-            &.deleted{
+            &.deleted {
                 max-height: 0;
                 padding-block: 0;
                 opacity: 0;
@@ -107,22 +107,22 @@
                                     position: relative;
                                     top: 3.5px;
                                     margin: 0 auto;
-                                    
+
                                     &:before,
                                     &:after {
                                         content: "";
                                         position: absolute;
                                     }
-                                    
+
                                     &:before {
                                         left: -10px;
                                     }
-                                    
+
                                     &:after {
                                         left: 10px;
                                     }
                                 }
-                                
+
                                 .bin-lines,
                                 .bin-lines::before,
                                 .bin-lines::after {
@@ -137,7 +137,7 @@
                     }
 
                     .lid,
-                    .lid:before{
+                    .lid:before {
                         background-color: $blackish;
                     }
 
@@ -169,12 +169,12 @@
                         .box {
                             border-color: $teal;
                         }
-                        
+
                         .lid,
                         .lid::before,
                         .bin-lines,
                         .bin-lines::before,
-                        .bin-lines::after{
+                        .bin-lines::after {
                             background-color: $teal;
                         }
                     }

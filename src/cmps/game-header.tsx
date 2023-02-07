@@ -97,8 +97,6 @@ export function GameHeader({ eventBus }: { eventBus: Function }) {
         setIsOn(isGameOnBeforeAction)
         setIsSaveShapeMode('')
         eventBus().emit('onChangeGameState', { isOn: isGameOnBeforeAction })
-        if (isGameOnBeforeAction) buttonAnimRef.current.play.beginElement()
-        else buttonAnimRef.current.pause.beginElement()
         if (!flkty) signToFlickity()
         flkty.select(1)
         saveShapeFormRef!.current!.hidden = true

@@ -32,7 +32,7 @@ export function Board({ eventBus }: { eventBus: Function }) {
     // range props
     const snapshotDuration = 1500
     const ranges = useRef<{ [name: string]: { max: number, min: number, current: number } }>({
-        speed: { min: 50, max: 1300, current: 250 },
+        speed: { min: 30, max: 1300, current: 1046 },
         resolution: { min: 20, max: 100, current: 40 },
         population: { min: 0, max: 100, current: 22 }
     })

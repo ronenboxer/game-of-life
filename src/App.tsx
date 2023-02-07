@@ -32,15 +32,15 @@ function App() {
 
       <nav className="app-nav main-layout flex align-center">
         <Logo />
-        <NavLink to="/about">About</NavLink>
-        <NavLink to="instructions">Instructions</NavLink>
+        <NavLink to="/gameoflife/about">About</NavLink>
+        <NavLink to="/gameoflife/instructions">Instructions</NavLink>
 
       </nav>
       <Routes>
-        <Route path="/instructions" element={<Instructions />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/" element={<Board eventBus={createEventEmitter} />} />
-        <Route path="*" element={<Navigate to="/"/>} />
+        <Route path="/gameoflife/instructions" element={<Instructions />} />
+        <Route path="/gameoflife/about" element={<About />} />
+        <Route path="/gameoflife" element={<Board eventBus={createEventEmitter} />} />
+        <Route path="*" element={<Navigate to="/gameoflife"/>} />
       </Routes>
     </main>
   );
