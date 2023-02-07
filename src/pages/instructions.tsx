@@ -3,7 +3,7 @@ import boardService from "../services/board.service";
 export function Instructions() {
     return (
         <section className="instructions main-layout">
-
+            <h2>Instructions</h2>
             <p>We will refer to each step of the game as a generation. Generations change simultaneously and universally throughout the grid. Each cell is colored according to its state. There are additional mid-states; "Dying" and "Being Born" as well as "Super-life" - an immortality cell state. Each state is colored accordingly:
             </p>
             <ul className="color-map">
