@@ -28,6 +28,7 @@ export function Board({ eventBus }: { eventBus: Function }) {
     let gRows: number
     let village = useRef(null as unknown as string[][])
     let lastHoveredCell = [-1, -1]
+    const margin = 12
 
     // range props
     const snapshotDuration = 1500
@@ -250,8 +251,8 @@ export function Board({ eventBus }: { eventBus: Function }) {
         elBoardContainer = boardContainerRef.current
         ctx.current = canvas.getContext('2d') as CanvasRenderingContext2D
         if (!ctx.current) return
-        gCols = Math.floor(elBoardContainer.offsetWidth / size)
-        gRows = Math.floor(elBoardContainer.offsetHeight / size)
+        gCols = Math.floor((elBoardContainer.offsetWidth - 2 * margin) / size)
+        gRows = Math.floor((elBoardContainer.offsetHeight - 2 * margin) / size)
         if (isLoadingBoard) {
             isLoadingBoard = false
         }
@@ -395,6 +396,13 @@ export function Board({ eventBus }: { eventBus: Function }) {
     })
 
     // shape/board listeners
+    window.addEventListener('resize', () => {
+        if (isOn.current) pause()
+        utilService.debounce(() => {
+            calcBoardSize()
+            if (isOn.current) play()
+        }, 300)()
+    })
     eventBus().on('cancelSaveMode', () => saveElementsContainer.current?.classList.remove('show'))
     eventBus().on('onSaveShape', onCaptureAndSave)
     eventBus().on('onSaveMode', (isShape: boolean) => {

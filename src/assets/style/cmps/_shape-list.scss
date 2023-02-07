@@ -5,30 +5,34 @@
         transition: ease-in-out .5s !important;
         font-weight: 500;
 
-        &:hover{
-            color: $teal;
-            text-decoration: underline;
+        @include hover-supported() {
+            &:hover {
+                color: $teal;
+                text-decoration: underline;
+            }
         }
 
-        &.factory{
+        &.factory {
             margin-top: 40px;
         }
 
         height: 30px;
         margin-block: 20px;
+
         svg {
             transition: transform .3s;
         }
 
         &:has(+ .expanded) {
             color: $teal;
+
             svg {
                 transform: rotate(90deg);
             }
         }
     }
 
-    ul:last-of-type{
+    ul:last-of-type {
         margin-bottom: 30px;
     }
 

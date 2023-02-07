@@ -10,6 +10,8 @@ $hover-color: $dirty-green;
     background-color: transparent;
     font-size: 1.2rem;
     font-family: 'Dosis', 'Roboto', 'san-serif';
+    flex-shrink: 0;
+    flex-grow: 0;
 
     .gallery-cell {
         width: 100%;
@@ -26,6 +28,14 @@ $hover-color: $dirty-green;
         gap: 20px;
         padding-bottom: 20px;
 
+        &.top {
+            margin-block: 20px 12px;
+            padding: 0;
+        }
+
+        @include for-mobile-layout() {
+            justify-content: center;
+        }
 
         button {
             $btn-clr: $whitish;
@@ -48,10 +58,12 @@ $hover-color: $dirty-green;
                 width: 32px;
                 height: 32px;
                 padding: 4px;
-                &::after{
+
+                &::after {
                     border-radius: 50%;
                 }
-                &:disabled{
+
+                &:disabled {
                     cursor: not-allowed;
                 }
             }
@@ -105,32 +117,37 @@ $hover-color: $dirty-green;
                 transition: opacity 100ms linear;
             }
 
-            &:hover:not(:disabled)>* {
-                color: $teal;
-                text-shadow: none;
-                animation: none;
+            @include hover-supported() {
+
+                &:hover:not(:disabled)>* {
+                    color: $teal;
+                    text-shadow: none;
+                    animation: none;
+                }
             }
 
-            &:hover:not(:disabled) {
+            @include hover-supported() {
+                &:hover:not(:disabled) {
 
-                &::before {
-                    content: "";
-                    position: absolute;
-                    top: 0;
-                    bottom: 0;
-                    left: 0;
-                    right: 0;
-                    opacity: 0.7;
-                    filter: blur(1em);
-                    transform: translateY(120%) rotateX(95deg) scale(1, 0.35);
-                    background: $btn-clr;
-                    pointer-events: none;
-                    filter: blur(1.5em);
-                    opacity: 1;
-                }
+                    &::before {
+                        content: "";
+                        position: absolute;
+                        top: 0;
+                        bottom: 0;
+                        left: 0;
+                        right: 0;
+                        opacity: 0.7;
+                        filter: blur(1em);
+                        transform: translateY(120%) rotateX(95deg) scale(1, 0.35);
+                        background: $btn-clr;
+                        pointer-events: none;
+                        filter: blur(1.5em);
+                        opacity: 1;
+                    }
 
-                &::after {
-                    opacity: 1;
+                    &::after {
+                        opacity: 1;
+                    }
                 }
             }
         }
@@ -176,6 +193,10 @@ $hover-color: $dirty-green;
             background: none;
             padding-block: 3px;
             margin-inline-end: 12px;
+
+            @include for-mobile-layout() {
+                width: 160px;
+            }
         }
     }
 
@@ -192,9 +213,11 @@ $hover-color: $dirty-green;
                 margin-right: 12px;
             }
 
-            &:hover {
-                color: $teal;
-                background-color: $whitish;
+            @include hover-supported() {
+                &:hover {
+                    color: $teal;
+                    background-color: $whitish;
+                }
             }
 
             &.submit-button {
@@ -202,7 +225,7 @@ $hover-color: $dirty-green;
             }
 
             &.cancel-button {
-                padding: 6px;
+                padding: 3.7px;
                 top: 20px;
                 right: $layout-margin;
                 font-size: 1.475rem;
@@ -212,8 +235,10 @@ $hover-color: $dirty-green;
                 background-color: $whitish;
                 color: $teal;
 
-                &:hover {
-                    opacity: .8;
+                @include hover-supported() {
+                    &:hover {
+                        opacity: .8;
+                    }
                 }
             }
         }

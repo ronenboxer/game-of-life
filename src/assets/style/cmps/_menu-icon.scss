@@ -3,12 +3,14 @@
     width: 30px;
     stroke: $concrete-white;
     margin-inline: auto 3px;
-    top: -38px;
+    top: -35px;
     right: 12px;
 
-    &:hover {
-        .menu-btn {
-            stroke: $hover-color;
+    @include hover-supported() {
+        &:hover {
+            .menu-btn {
+                stroke: $hover-color;
+            }
         }
     }
 

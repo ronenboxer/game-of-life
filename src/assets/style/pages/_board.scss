@@ -2,9 +2,17 @@
     width: calc(100% - 48px);
     margin-inline-start: 23px;
     flex-grow: 3;
-    height: calc(100vh - 130px);
-    top: calc(50% - 68.9px) !important;
-    padding: 50px;
+    flex-shrink: 3;
+    // height: calc(100vh - 200px);
+    max-height: calc(100vh);
+    top: calc(50% - 70px) !important;
+    padding: 20px;
+
+    
+    @include for-mobile-layout(){
+        
+        top: calc(50% - 104px) !important;
+    }
 
     canvas.pseudo-load-canvas {
         z-index: 4;
@@ -15,7 +23,7 @@
         }
     }
 
-    canvas{
+    canvas {
         opacity: .6;
     }
 

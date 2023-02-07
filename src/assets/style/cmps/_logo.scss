@@ -4,18 +4,22 @@
   width: $size;
 
   $logo-black: $dark-black;
-  
-  &:hover{
-    .heart svg{
-      color: $teal;
+
+  @include hover-supported() {
+    &:hover {
+      .heart svg {
+        color: $teal;
+      }
     }
   }
+
   .heart {
     width: $size;
     height: 100%;
     font-size: 1.5em;
     align-items: center;
     justify-content: center;
+
     svg {
       -webkit-animation: heartbeat 2s infinite;
       -moz-animation: heartbeat 2s infinite;
@@ -23,9 +27,9 @@
       animation: heartbeat 2s infinite;
       color: $whitish;
     }
-    
+
   }
-  
+
   .heart-rate {
     height: $size;
     width: $size;
@@ -36,7 +40,7 @@
     color: $color;
     top: 0%;
     left: -127.5%;
-    
+
     svg {
       transform: scale(.225);
       width: 150px;

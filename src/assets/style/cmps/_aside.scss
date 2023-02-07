@@ -20,8 +20,12 @@
         $shade-0: #fff !default;
         $background: $dark-black;
         $width: 275px;
-        height: calc(100vh - 137.42px);
+        height: calc(100vh - 125.43px);
         overflow-y: auto;
+
+        @include for-mobile-layout() {
+            height: calc(100vh - 189.44px);
+        }
 
         z-index: 100;
         background-color: $background;
@@ -32,6 +36,7 @@
         opacity: 1;
 
         color: $text-color;
+        top: 0px;
         left: calc(-9px - $width);
 
         >*:not(.menu-icon) {
@@ -203,8 +208,10 @@
                     cursor: pointer;
                     transition: background .15s ease-in-out;
 
-                    &:hover {
-                        background: $range-handle-color-hover;
+                    @include hover-supported() {
+                        &:hover {
+                            background: $range-handle-color-hover;
+                        }
                     }
                 }
 
@@ -221,8 +228,11 @@
                     cursor: pointer;
                     transition: background .15s ease-in-out;
 
-                    &:hover {
-                        background: $range-handle-color-hover;
+                    @include hover-supported() {
+
+                        &:hover {
+                            background: $range-handle-color-hover;
+                        }
                     }
                 }
 

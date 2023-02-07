@@ -2,6 +2,13 @@ import { MouseEvent } from "react"
 import { Cell, Shape } from "./board.service"
 export default new class utilService {
 
+    debounce = (func: Function, timeout = 300) => {
+        let timer: any
+        return (...args: any) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => { func.apply(this, args); }, timeout)
+        }
+    }
     hexToRGB = (hex: string) => {
         const r = parseInt(hex.slice(1, 3), 16)
         const g = parseInt(hex.slice(3, 5), 16)

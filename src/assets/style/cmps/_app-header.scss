@@ -8,7 +8,9 @@
     font-size: 1.2rem;
     font-family: 'Dosis', 'Roboto', 'san-serif';
 
-        gap: 20px;
-        height: 3em;
-        margin-top: 12px;
-    }
+    gap: 20px;
+    height: 3em;
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin-top: 20px;
+}
