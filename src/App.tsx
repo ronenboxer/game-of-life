@@ -40,6 +40,7 @@ function App() {
         <Route path="/gameoflife/instructions" element={<Instructions />} />
         <Route path="/gameoflife/about" element={<About />} />
         <Route path="/gameoflife" element={<Board eventBus={createEventEmitter} />} />
+        <Route path="/gameoflife/*" element={<Navigate to="/gameoflife"/>} />
         <Route path="*" element={<Navigate to="/gameoflife"/>} />
       </Routes>
     </main>
