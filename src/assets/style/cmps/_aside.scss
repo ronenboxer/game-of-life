@@ -21,7 +21,7 @@
         $background: $dark-black;
         $width: 275px;
         height: calc(100vh - 125.43px);
-        overflow-y: auto;
+        overflow-y: hidden;
 
         @include for-mobile-layout() {
             height: calc(100vh - 189.44px);
@@ -30,7 +30,7 @@
         z-index: 100;
         background-color: $background;
         width: $width;
-        padding-inline: 20px;
+        padding-inline: 25px;
         transition: left ease-in-out .5s;
         pointer-events: all;
         opacity: 1;
@@ -46,6 +46,7 @@
 
         &.active {
             left: -49px;
+            overflow-y: auto;
 
             >*:not(.menu-icon) {
                 left: 0;

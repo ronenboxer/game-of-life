@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import boardService, { Shape, Shapes } from "../services/board.service"
+import boardService, { Shape } from "../services/board.service"
 import { MenuIcon } from "./menu-icon"
 import { ShapeList } from "./shape-list"
 
@@ -27,7 +27,7 @@ export function Aside({ eventBus }: { eventBus: Function }) {
     const [isInfiniteAxis, setIsInfiniteAxis] = useState({ x: true, y: true })
     const rangeInputRefs = useRef<RangeInput>({} as RangeInput)
     const [rangeVals, setRangeVals] = useState({ speed: 20, population: 22, resolution: 44 })
-    const [gResolution, setResolution] = useState(40)
+    const [gResolution] = useState(40)
 
     function toggleMenuActive() {
         setIsMenuActive(!isMenuActive)
@@ -64,15 +64,29 @@ export function Aside({ eventBus }: { eventBus: Function }) {
         })
     }
 
-    useEffect(() => { 
-        // console.log('123123')
-    }, [shapesObj])
+    useEffect(() => {
+        console.log('mounting aside')
+        return () => {
+            console.log('unmounting aside')
+            removeOnSaveListener()
+            removeOnSaveModeListener()
+            removeOnLoadListener()
+            removeOnReloadShapesListener()
+            removeOnDeleteSavedShapeListener()
+            document.removeEventListener('keydown', onEsc)
+        }
+    })
 
-    eventBus().on('onSaveEvent', onLoadShapes)
-    eventBus().on('onSaveMode', () => setIsMenuActive(false))
-    eventBus().on('onLoadShape', () => setIsMenuActive(false))
+    const removeOnSaveListener = eventBus().on('onSaveEvent', onLoadShapes)
+    const removeOnSaveModeListener = eventBus().on('onSaveMode', () => setIsMenuActive(false))
+    const removeOnLoadListener = eventBus().on('onLoadShape', () => setIsMenuActive(false))
+    const removeOnDeleteSavedShapeListener = eventBus().on('deleteSavedShape', ({ type, }: { type: string }) =>{
+        setTimeout(() => {
+            setShapes(prevShapes => ({...prevShapes, [type]:boardService.loadShapesFromStorage(type)}))
+        }, 400);
+    })
 
-    eventBus().on('reloadShapes', (type?: string) => {
+    const removeOnReloadShapesListener = eventBus().on('reloadShapes', (type?: string) => {
         if (type) setShapes(prevShapes => ({ ...prevShapes, [type]: boardService.loadShapesFromStorage(type) }))
         else setShapes({
             factory: boardService.getFactoryShapes(),
@@ -81,7 +95,10 @@ export function Aside({ eventBus }: { eventBus: Function }) {
         })
     })
 
-    document.addEventListener('keydown', (ev: KeyboardEvent) => ev.key === 'Escape' ? setIsMenuActive(false) : null)
+    document.addEventListener('keydown', onEsc)
+    function onEsc(ev: KeyboardEvent) { 
+        if (ev.key === 'Escape') setIsMenuActive(false) 
+    }
 
     return (
         <section className={`menu-screen fixed ${isMenuActive ? 'active' : ''}`} onClick={toggleMenuActive}>

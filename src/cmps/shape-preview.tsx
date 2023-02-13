@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from "react"
-import { RemoveIcon } from "./remove-icon"
+import { useEffect, useRef } from "react"
 import { ShapeShifter } from "./shape-shifter"
 import boardService, { Shape } from '../services/board.service'
 
@@ -60,15 +59,22 @@ export function ShapePreview({ type, idx, shape, name, eventBus, maxWidth, gReso
     useEffect(() => {
         if (!canvasRef?.current) return
         renderCanvas(canvasRef.current)
-    }, [canvasRef.current, shape])
+        return () => {
+            removeOnTransformShapeListener()
+            removeOnDeleteSavedShapeListener()
+        }
+    })
 
-    eventBus().on('onTransformShape', onTransformShape)
-    eventBus().on('deleteSavedShape', ({ type: typeToDelete, idx: idxToDelete, name: nameToDelete }: { type: string, name: string, idx: number }) => {
+    const removeOnTransformShapeListener = eventBus().on('onTransformShape', onTransformShape)
+    const removeOnDeleteSavedShapeListener = eventBus().on('deleteSavedShape', ({ type: typeToDelete, idx: idxToDelete, name: nameToDelete }: { type: string, name: string, idx: number }) => {
         if (idx === idxToDelete &&
             type === typeToDelete &&
-            name === nameToDelete) savedShapeRef.current?.classList.add('deleted')
-        boardService.removeShapeFromStorage(type, name)
+            name === nameToDelete) {
+            savedShapeRef.current?.classList.add('deleted')
+            boardService.removeShapeFromStorage(type, name)
+        }
     })
+
     return (
         <li className="saved-shape flex column center" ref={savedShapeRef}>
             <div className="shape-header flex between align center relative">

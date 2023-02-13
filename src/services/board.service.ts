@@ -20,8 +20,6 @@ export default new class boardService {
         board: 'GOL_Board_DB',
         shape: 'GOL_Shapes_DB'
     }
-    private SHAPE_STORAGE_KEY = 'GOL_Shapes_DB'
-    private BOARD_STORAGE_KEY = 'GOL_Board_DB'
     private stateColorMap = {
         dead: '#808080',
         dying: '#b82462',
@@ -31,7 +29,6 @@ export default new class boardService {
         null: 'transparent'
     }
     private lightenPercentage = 20
-    private isInfinite = true
     private isXInfinite = true
     private isYInfinite = true
     private isStatic = false
@@ -56,9 +53,6 @@ export default new class boardService {
         if (axis === 'x') this.isXInfinite = isInfinite
         if (axis === 'y') this.isYInfinite = isInfinite
     }
-    setAxisInfiniteProp(isInfinite: boolean) {
-        this.isInfinite = isInfinite
-    }
 
     getBoard(rows: number, cols: number, populationPercentage = 50) {
         this.population = 0
@@ -69,9 +63,6 @@ export default new class boardService {
                     if (!isAlive) return 'dead'
                     this.population++
                     return 'alive'
-                    return Math.random() > (100 - populationPercentage) / 100
-                        ? 'alive'
-                        : 'dead'
                 }))
     }
 
@@ -175,6 +166,7 @@ export default new class boardService {
     }
 
     removeShapeFromStorage(key = 'shape', name:string){
+        debugger
         const shapes = this.loadShapesFromStorage(key)
         if (!shapes || !shapes[name as keyof typeof shapes]) return
         delete shapes[name as keyof typeof shapes]
@@ -238,8 +230,6 @@ export default new class boardService {
 
     resizeShape(shape: Shape, newSize: number[]) {
         const [ROWS, COLS] = newSize
-        const rowDiff = shape.size[0] - ROWS
-        const colDiff = shape.size[1] - COLS
         const newShape = { ...shape }
         let endRow = 0
         let endCol = 0

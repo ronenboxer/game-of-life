@@ -29,9 +29,12 @@ export function ShapeList({ type, shapes, onTransformShape, eventBus, gResolutio
     }
 
     useEffect(() => {
-    }, [shapes])
-    
-    eventBus().on('menuToggled', () => shapeListRef.current?.classList.remove('expanded'))
+        return () => {
+            removeOnMenuToggledListener()
+        }
+    })
+
+    const removeOnMenuToggledListener = eventBus().on('menuToggled', () => shapeListRef.current?.classList.remove('expanded'))
 
     return (
         <>
@@ -39,11 +42,12 @@ export function ShapeList({ type, shapes, onTransformShape, eventBus, gResolutio
                 <span>{TITLES[type as keyof typeof TITLES]}</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><rect x="0" y="0" width="24" height="24" fill="none" stroke="none" /><path fill="currentColor" d="M8.025 22L6.25 20.225L14.475 12L6.25 3.775L8.025 2l10 10Z" /></svg>
             </h2>
-            <ul ref={shapeListRef} className={`shape-list dropdown-menu relative clean-list ${type}`}>
-                {
-                    Object.keys(shapes).length &&
-                    Object.keys(shapes).map((name, idx) => <ShapePreview {...{ name, type, eventBus, gResolution, onTransformShape, idx }}
-                        shape={shapes[name]} maxWidth={(shapeListRef.current?.offsetWidth || 255) - CANVAS_PADDING} key={idx + ':' + type + ':' + name} />)}
+            <ul ref={shapeListRef} className={`shape-list dropdown-menu relative clean-list ${type} ${!Object.keys(shapes).length ? 'empty flex' : ''}`}>
+                {Object.keys(shapes).length
+                    ? Object.keys(shapes).map((name, idx) => <ShapePreview {...{ name, type, eventBus, gResolution, onTransformShape, idx }}
+                        shape={shapes[name]} maxWidth={(shapeListRef.current?.offsetWidth || 255) - CANVAS_PADDING} key={idx + ':' + type + ':' + name} />)
+                    : <h2>I'm an empty list</h2>
+                }
             </ul>
         </>
     )

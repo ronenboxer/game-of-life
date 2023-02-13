@@ -1,11 +1,10 @@
 import React, { MouseEvent, useEffect, useRef } from "react"
-import boardService, { Cell, Shape, Shapes } from "../services/board.service"
+import boardService, { Shape } from "../services/board.service"
 import utilService from "../services/util.service"
 import { Aside } from "../cmps/aside"
 import { GameHeader } from "../cmps/game-header"
 
 export function Board({ eventBus }: { eventBus: Function }) {
-
 
     // element refs
     const boardContainerRef = useRef<HTMLElement>(null)
@@ -92,7 +91,7 @@ export function Board({ eventBus }: { eventBus: Function }) {
         cornerEnd = [row, col]
         renderBoard()
 
-        ctx.current.fillStyle = boardService.lighten(village.current[row][col])
+        if (!(ev.nativeEvent instanceof TouchEvent)) ctx.current.fillStyle = boardService.lighten(village.current[row][col])
         ctx.current.stroke()
         ctx.current.fillRect(col * size, row * size, size, size)
     }
@@ -153,7 +152,7 @@ export function Board({ eventBus }: { eventBus: Function }) {
         if (!canvas) canvas = canvasRef.current!
         loaderCanvas!.style.top = canvas.offsetTop + 'px'
         loaderCanvas!.style.left = canvas.offsetLeft + 'px'
-        if (!gRows && !gCols || !loadedShape) return
+        if ((!gRows && !gCols) || !loadedShape) return
         row = row >= gRows
             ? gRows - 1
             : row < 0
@@ -363,24 +362,40 @@ export function Board({ eventBus }: { eventBus: Function }) {
     }
 
     useEffect(() => {
-        console.log('here')
+        console.log('board mounted')
         calcBoardSize()
         play()
-    }, [])
 
-    eventBus().on('onChangeGameState', ((state: { isOn: boolean } | null) => {
+        return () =>{
+            console.log('board unmounted')
+            removeOnChangeGameStateListener()
+            removeOnToggleInfiniteAxisListener()
+            removeOnStepListener()
+            removeOnSetRangedValsListener()
+            removeOnCancelSaveModeListener()
+            removeOnSaveShapeListener()
+            removeOnSaveModeListener()
+            removeOnLoadShapeListener()
+            removeOnLoadShapePositionListener()
+            removeOnToggleSuperLifeListener()
+            removeOnMenuToggledListener()
+            window.removeEventListener('resize', onResize)
+        }
+    })
+
+    const removeOnChangeGameStateListener = eventBus().on('onChangeGameState', ((state: { isOn: boolean } | null) => {
         if (!state?.isOn) return pause()
         isOn.current = state.isOn
         return isOn.current
             ? play()
             : pause()
     }))
-    eventBus().on('onToggleInfiniteAxis', (axis: string) => {
+    const removeOnToggleInfiniteAxisListener = eventBus().on('onToggleInfiniteAxis', (axis: string) => {
         boardService.setInfiniteProp(axis, !isInfinite[axis as keyof typeof isInfinite])
         isInfinite[axis as keyof typeof isInfinite] = !isInfinite[axis as keyof typeof isInfinite]
     })
-    eventBus().on('onStep', onStep)
-    eventBus().on('onSetRangedVal', ({ percentage, rangeFor }: { percentage: number, rangeFor: string }) => {
+    const removeOnStepListener = eventBus().on('onStep', onStep)
+    const removeOnSetRangedValsListener = eventBus().on('onSetRangedVal', ({ percentage, rangeFor }: { percentage: number, rangeFor: string }) => {
         if (!ranges.current[rangeFor as keyof typeof ranges]) return
         const { max, min } = ranges.current[rangeFor as keyof typeof ranges]
         const range = max - min
@@ -396,16 +411,18 @@ export function Board({ eventBus }: { eventBus: Function }) {
     })
 
     // shape/board listeners
-    window.addEventListener('resize', () => {
+    window.addEventListener('resize', onResize )
+    function onResize(){
         if (isOn.current) pause()
         utilService.debounce(() => {
             calcBoardSize()
             if (isOn.current) play()
         }, 300)()
-    })
-    eventBus().on('cancelSaveMode', () => saveElementsContainer.current?.classList.remove('show'))
-    eventBus().on('onSaveShape', onCaptureAndSave)
-    eventBus().on('onSaveMode', (isShape: boolean) => {
+    }
+
+    const removeOnCancelSaveModeListener = eventBus().on('cancelSaveMode', () => saveElementsContainer.current?.classList.remove('show'))
+    const removeOnSaveShapeListener = eventBus().on('onSaveShape', onCaptureAndSave)
+    const removeOnSaveModeListener = eventBus().on('onSaveMode', (isShape: boolean) => {
         onCancelLoad()
         pause()
         if (isShape) return onSaveShape()
@@ -418,8 +435,9 @@ export function Board({ eventBus }: { eventBus: Function }) {
         cornerStart = null
         cornerEnd = null
     })
-    eventBus().on('onLoadShape', onLoadShape)
-    eventBus().on('onLoadShapePosition', (state: string) => {
+    const removeOnLoadShapeListener = eventBus().on('onLoadShape', onLoadShape)
+    const removeOnLoadShapePositionListener = eventBus().on('onLoadShapePosition', (state: string) => {
+        debugger
         switch (state) {
             case 'position':
                 positionLoadedShape()
@@ -432,9 +450,8 @@ export function Board({ eventBus }: { eventBus: Function }) {
     })
 
     // mode listeners
-    eventBus().on('onSuperLife', () => { isSuperMode = true })
-    eventBus().on('endSuperLife', () => { isSuperMode = false })
-    eventBus().on('menuToggled', () => onCancelLoad())
+    const removeOnToggleSuperLifeListener = eventBus().on('toggleSuperLife', (state:boolean) => { isSuperMode = state })
+    const removeOnMenuToggledListener = eventBus().on('menuToggled', () => onCancelLoad())
 
 
     return (

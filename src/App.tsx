@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { Board } from './pages/board';
 import { About } from './pages/about';
 import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
@@ -9,7 +7,6 @@ import { Instructions } from './pages/instructions';
 function App() {
 
   const listenersMap: { [key: string]: Function[] } = {}
-  const [isMenuActive, setIsMenuActive] = useState(false)
 
   function createEventEmitter() {
     return {
