@@ -362,12 +362,10 @@ export function Board({ eventBus }: { eventBus: Function }) {
     }
 
     useEffect(() => {
-        console.log('board mounted')
         calcBoardSize()
         play()
 
         return () =>{
-            console.log('board unmounted')
             removeOnChangeGameStateListener()
             removeOnToggleInfiniteAxisListener()
             removeOnStepListener()

@@ -65,9 +65,7 @@ export function Aside({ eventBus }: { eventBus: Function }) {
     }
 
     useEffect(() => {
-        console.log('mounting aside')
         return () => {
-            console.log('unmounting aside')
             removeOnSaveListener()
             removeOnSaveModeListener()
             removeOnLoadListener()
