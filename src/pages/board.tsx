@@ -1,4 +1,4 @@
-import React, { MouseEvent, useEffect, useRef } from "react"
+import React, { MouseEvent, useEffect, useRef, useState } from "react"
 import boardService, { Shape } from "../services/board.service"
 import utilService from "../services/util.service"
 import { Aside } from "../cmps/aside"
@@ -38,8 +38,8 @@ export function Board({ eventBus }: { eventBus: Function }) {
     })
 
     // gameplay props
-    const genCounter = useRef(1)
-    const population = useRef(0)
+    const [genCounter, setGenCounter] = useState(1)
+    const [population, setPopulation] = useState(0)
     const selectHandler = useRef(onSelect)
     let isNextGen = true
     let intervalId = useRef(null as unknown as string | number | NodeJS.Timer | undefined)
@@ -216,8 +216,8 @@ export function Board({ eventBus }: { eventBus: Function }) {
         if (isNextGen) village.current = boardService.getNextGen(village.current)
         else {
             village.current = boardService.updateCurrGen(village.current)
-            genCounter.current++
-            population.current = boardService.getPopulation()
+            setGenCounter(prevCounter => prevCounter+1)
+            setPopulation(boardService.getPopulation())
             if (boardService.getIsStatic()) eventBus().emit('actionStart', { isOn: false })
         }
         isNextGen = !isNextGen
@@ -459,7 +459,12 @@ export function Board({ eventBus }: { eventBus: Function }) {
             <GameHeader eventBus={eventBus} />
             <section className="board-container relative flex column center" ref={boardContainerRef}>
                 <Aside eventBus={eventBus} />
-
+                <div className="stats">
+                    <h3>
+                        <span>Gen: {genCounter}</span>
+                        <span> | Pop: {population}</span>
+                    </h3>
+                </div>
                 <canvas ref={canvasRef} onMouseMove={onHover} onClick={onSelectHandler} onMouseLeave={() => {
                     lastHoveredCell = [-1, -1]
                     renderBoard()

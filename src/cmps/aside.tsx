@@ -75,7 +75,7 @@ export function Aside({ eventBus }: { eventBus: Function }) {
             removeOnDeleteSavedShapeListener()
             document.removeEventListener('keydown', onEsc)
         }
-    })
+    },[])
 
     const removeOnSaveListener = eventBus().on('onSaveEvent', onLoadShapes)
     const removeOnSaveModeListener = eventBus().on('onSaveMode', () => setIsMenuActive(false))

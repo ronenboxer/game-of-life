@@ -14,6 +14,11 @@
         top: calc(50% - 104px) !important;
     }
 
+    .stats h3{
+        color: $whitish;
+        font-weight: 500;
+    }
+
     canvas.pseudo-load-canvas {
         z-index: 4;
         pointer-events: none;
