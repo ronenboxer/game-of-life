@@ -65,6 +65,29 @@ export function Aside({ eventBus }: { eventBus: Function }) {
     }
 
     useEffect(() => {
+        const removeOnSaveListener = eventBus().on('onSaveEvent', onLoadShapes)
+        const removeOnSaveModeListener = eventBus().on('onSaveMode', () => setIsMenuActive(false))
+        const removeOnLoadListener = eventBus().on('onLoadShape', () => setIsMenuActive(false))
+        const removeOnReloadShapesListener = eventBus().on('reloadShapes', (type?: string) => {
+            if (type) setShapes(prevShapes => ({ ...prevShapes, [type]: boardService.loadShapesFromStorage(type) }))
+            else setShapes({
+                factory: boardService.getFactoryShapes(),
+                shape: boardService.loadShapesFromStorage('shape'),
+                board: boardService.loadShapesFromStorage('board')
+            })
+        })
+        const removeOnDeleteSavedShapeListener = eventBus().on('deleteSavedShape', ({ type, idx, name }: { type: string, name: string, idx: number }) => {
+            boardService.removeShapeFromStorage(type, name)
+            setTimeout(() => {
+                setShapes(prevShapes => ({ ...prevShapes, [type]: boardService.loadShapesFromStorage(type) }))
+            }, 1000)
+        })
+
+        document.addEventListener('keydown', onEsc)
+        function onEsc(ev: KeyboardEvent) {
+            if (ev.key === 'Escape') setIsMenuActive(false)
+        }
+
         return () => {
             removeOnSaveListener()
             removeOnSaveModeListener()
@@ -73,30 +96,8 @@ export function Aside({ eventBus }: { eventBus: Function }) {
             removeOnDeleteSavedShapeListener()
             document.removeEventListener('keydown', onEsc)
         }
-    },[])
+    }, [])
 
-    const removeOnSaveListener = eventBus().on('onSaveEvent', onLoadShapes)
-    const removeOnSaveModeListener = eventBus().on('onSaveMode', () => setIsMenuActive(false))
-    const removeOnLoadListener = eventBus().on('onLoadShape', () => setIsMenuActive(false))
-    const removeOnDeleteSavedShapeListener = eventBus().on('deleteSavedShape', ({ type, }: { type: string }) =>{
-        setTimeout(() => {
-            setShapes(prevShapes => ({...prevShapes, [type]:boardService.loadShapesFromStorage(type)}))
-        }, 400);
-    })
-
-    const removeOnReloadShapesListener = eventBus().on('reloadShapes', (type?: string) => {
-        if (type) setShapes(prevShapes => ({ ...prevShapes, [type]: boardService.loadShapesFromStorage(type) }))
-        else setShapes({
-            factory: boardService.getFactoryShapes(),
-            shape: boardService.loadShapesFromStorage('shape'),
-            board: boardService.loadShapesFromStorage('board')
-        })
-    })
-
-    document.addEventListener('keydown', onEsc)
-    function onEsc(ev: KeyboardEvent) { 
-        if (ev.key === 'Escape') setIsMenuActive(false) 
-    }
 
     return (
         <section className={`menu-screen fixed ${isMenuActive ? 'active' : ''}`} onClick={toggleMenuActive}>

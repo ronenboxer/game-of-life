@@ -1,9 +1,9 @@
 // { onRemoveShape }: { onRemoveShape: Function }
-export function RemoveIcon({ onDeleteShape }: { onDeleteShape: Function }) {
+export function RemoveIcon({ onDelete }: { onDelete: Function }) {
 
     return (
         <label className="delete-trigger-container flex center">
-            <input hidden type="checkbox" className="delete-trigger" onChange={()=>onDeleteShape()}></input>
+            <input hidden type="checkbox" className="delete-trigger" onChange={() => onDelete()}></input>
             <div className="bin-icon">
                 <div className="lid"></div>
                 <div className="box">

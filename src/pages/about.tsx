@@ -1,5 +1,3 @@
-
-
 export function About() {
     return (
         <section className="about main-layout">

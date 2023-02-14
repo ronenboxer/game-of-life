@@ -56,31 +56,34 @@ export function ShapePreview({ type, idx, shape, name, eventBus, maxWidth, gReso
         }
     }
 
+    function onDelete() {
+        eventBus().emit('deleteSavedShape', { type, name, idx })
+        savedShapeRef.current?.classList.add('deleted')
+    }
+
     useEffect(() => {
         if (!canvasRef?.current) return
+
+        // const removeOnDeleteSavedShapeListener = eventBus().on('deleteSavedShape', ({ type: typeToDelete, idx: idxToDelete, name: nameToDelete }: { type: string, name: string, idx: number }) => {
+        //     if (idx === idxToDelete &&
+        //         type === typeToDelete &&
+        //         name === nameToDelete) {
+        //         savedShapeRef.current?.classList.add('deleted')
+        //         boardService.removeShapeFromStorage(type, name)
+        //     }
+        // })
         renderCanvas(canvasRef.current)
         return () => {
-            removeOnTransformShapeListener()
-            removeOnDeleteSavedShapeListener()
+            // removeOnDeleteSavedShapeListener()
         }
-    })
-
-    const removeOnTransformShapeListener = eventBus().on('onTransformShape', onTransformShape)
-    const removeOnDeleteSavedShapeListener = eventBus().on('deleteSavedShape', ({ type: typeToDelete, idx: idxToDelete, name: nameToDelete }: { type: string, name: string, idx: number }) => {
-        if (idx === idxToDelete &&
-            type === typeToDelete &&
-            name === nameToDelete) {
-            savedShapeRef.current?.classList.add('deleted')
-            boardService.removeShapeFromStorage(type, name)
-        }
-    })
+    }, [shape])
 
     return (
         <li className="saved-shape flex column center" ref={savedShapeRef}>
             <div className="shape-header flex between align center relative">
                 <h2>{name}</h2>
             </div>
-            <ShapeShifter {...{ name, type, idx, eventBus, onTransformShape }} />
+            <ShapeShifter {...{ name, type, idx, eventBus, onTransformShape, onDelete }} />
             <canvas onClick={onLoadShape}
                 ref={canvasRef} data-name={name} data-type={type} />
         </li>

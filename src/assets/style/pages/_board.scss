@@ -3,14 +3,14 @@
     margin-inline-start: 23px;
     flex-grow: 3;
     flex-shrink: 3;
-    // height: calc(100vh - 200px);
+    height: calc(100vh - 145.416px);
     max-height: calc(100vh);
     top: calc(50% - 70px) !important;
     padding: 20px;
-
+    
     
     @include for-mobile-layout(){
-        
+        height: calc(100vh - 209.41px);
         top: calc(50% - 104px) !important;
     }
 

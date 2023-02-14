@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Shapes } from "../services/board.service";
+import boardService, { Shapes } from "../services/board.service";
 import { ShapePreview } from "./shape-preview";
 
 interface ShapeListProps {
@@ -29,12 +29,12 @@ export function ShapeList({ type, shapes, onTransformShape, eventBus, gResolutio
     }
 
     useEffect(() => {
+        const removeOnMenuToggledListener = eventBus().on('menuToggled', () => shapeListRef.current?.classList.remove('expanded'))
+        
         return () => {
             removeOnMenuToggledListener()
         }
-    })
-
-    const removeOnMenuToggledListener = eventBus().on('menuToggled', () => shapeListRef.current?.classList.remove('expanded'))
+    }, [])
 
     return (
         <>

@@ -166,7 +166,6 @@ export default new class boardService {
     }
 
     removeShapeFromStorage(key = 'shape', name:string){
-        debugger
         const shapes = this.loadShapesFromStorage(key)
         if (!shapes || !shapes[name as keyof typeof shapes]) return
         delete shapes[name as keyof typeof shapes]

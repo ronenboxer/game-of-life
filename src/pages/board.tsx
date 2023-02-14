@@ -23,10 +23,9 @@ export function Board({ eventBus }: { eventBus: Function }) {
 
     // board props
     const isInfinite = { x: true, y: true }
-    let gCols: number
-    let gRows: number
+    const gSize = useRef({ rows: 0, cols: 0 })
     let village = useRef(null as unknown as string[][])
-    let lastHoveredCell = [-1, -1]
+    const lastHoveredCell = useRef([-1, -1])
     const margin = 12
 
     // range props
@@ -49,12 +48,13 @@ export function Board({ eventBus }: { eventBus: Function }) {
     // shape cell selection
     let shapeFormattedCorners = [] as number[][]
     let shapeCorners = [] as number[][]
-    let cornerStart: number[] | null
-    let cornerEnd: number[] | null
+    const cornerStart = useRef<null | number[]>(null)
+    const cornerEnd = useRef<null | number[]>(null)
     let shapeDropCell = [-1, -1]
 
     // modes props
     const isOn = useRef(true)
+    const isOnPriorToAction = useRef(true)
     let isSaveShapeMode = false
     let isSuperMode = false
     let isLoadingBoard = true
@@ -65,9 +65,9 @@ export function Board({ eventBus }: { eventBus: Function }) {
 
     function onSelect(ev: MouseEvent | TouchEvent) {
         const size = ranges.current.resolution.current
-        const { row, col } = utilService.getCoordsByEv(ev as MouseEvent, gRows, gCols, size)
-        if (col >= gCols || col < 0 ||
-            row >= gRows || row < 0) return
+        const { row, col } = utilService.getCoordsByEv(ev as MouseEvent, gSize.current.rows, gSize.current.cols, size)
+        if (col >= gSize.current.cols || col < 0 ||
+            row >= gSize.current.rows || row < 0) return
 
         const currState = village.current[row][col]
 
@@ -83,23 +83,23 @@ export function Board({ eventBus }: { eventBus: Function }) {
 
     function onHover(ev: React.MouseEvent) {
         const size = ranges.current.resolution.current
-        const { row, col } = utilService.getCoordsByEv(ev, gRows, gCols, size)
-        if (col >= gCols || col < 0 ||
-            row >= gRows || row < 0) return
-        if (row === lastHoveredCell[0] && col === lastHoveredCell[1]) return
-        lastHoveredCell = [row, col]
-        cornerEnd = [row, col]
+        const { row, col } = utilService.getCoordsByEv(ev, gSize.current.rows, gSize.current.cols, size)
+        if (col >= gSize.current.cols || col < 0 ||
+            row >= gSize.current.rows || row < 0) return
+        if (row === lastHoveredCell.current[0] && col === lastHoveredCell.current[1]) return
+        lastHoveredCell.current = [row, col]
+        if (cornerStart.current) cornerEnd.current = [row, col]
         renderBoard()
 
-        if (!(ev.nativeEvent instanceof TouchEvent)) ctx.current.fillStyle = boardService.lighten(village.current[row][col])
-        ctx.current.stroke()
-        ctx.current.fillRect(col * size, row * size, size, size)
+        // if (!(ev.nativeEvent instanceof TouchEvent)) ctx.current.fillStyle = boardService.lighten(village.current[row][col])
+        // ctx.current.stroke()
+        // ctx.current.fillRect(col * size, row * size, size, size)
     }
 
     function onSaveShape() {
         selectHandler.current = onSelectCorners
-        cornerStart = null
-        cornerEnd = null
+        cornerStart.current = null
+        cornerEnd.current = null
         isSaveShapeMode = true
     }
 
@@ -110,6 +110,8 @@ export function Board({ eventBus }: { eventBus: Function }) {
         setTimeout(() => {
             saveElementsContainer?.current?.classList.toggle('show')
             eventBus().emit('actionEnd', null)
+            if (isOnPriorToAction.current && isOn.current) play()
+            isOn.current = isOnPriorToAction.current
         }, snapshotDuration);
         setTimeout(() => {
             pseudoCanvasWrapperRef?.current?.classList.toggle('done')
@@ -120,25 +122,31 @@ export function Board({ eventBus }: { eventBus: Function }) {
     function onSelectCorners(ev: MouseEvent | TouchEvent) {
         if (!isSaveShapeMode) return
         const size = ranges.current.resolution.current
-        const { row, col } = utilService.getCoordsByEv(ev, gRows, gCols, size)
-        if (!cornerStart) cornerStart = [row, col]
+        const { row, col } = utilService.getCoordsByEv(ev, gSize.current.rows, gSize.current.cols, size)
+        if (!cornerStart.current) cornerStart.current = [row, col]
         else {
-            shapeCorners = [[...cornerStart], [...cornerEnd || cornerStart]]
+            shapeCorners = [[...cornerStart.current], [row, col]]
             shapeFormattedCorners = boardService.getFormattedShapeCorners(shapeCorners, village.current)
-            cornerStart = null
-            cornerEnd = null
+            cornerStart.current = null
+            cornerEnd.current = null
 
             if (shapeFormattedCorners.length) {
                 snapCanvas()
                 eventBus().emit('cornersSelected', null)
                 saveElementsContainer?.current?.classList.toggle('show')
             }
-            else eventBus().emit('actionEnd', null)
+            else {
+                eventBus().emit('actionEnd', null)
+                if (isOnPriorToAction.current && !isOn.current) play()
+                isOn.current = isOnPriorToAction.current
+            }
         }
     }
 
     function onLoadShape({ shape, isBoard = false }: { shape: Shape, isBoard: boolean }) {
         eventBus().emit('actionStart', null)
+        if (isOn.current) pause()
+        isOn.current = (false)
         loadedShape = shape
         if (isBoard) isLoadingBoard = true
         selectHandler.current = (ev: MouseEvent | TouchEvent) => { }
@@ -147,25 +155,25 @@ export function Board({ eventBus }: { eventBus: Function }) {
 
     function onLoadShapeHover(ev: React.MouseEvent) {
         const size = ranges.current.resolution.current
-        let { row, col } = utilService.getCoordsByEv(ev, gRows, gCols, size)
+        let { row, col } = utilService.getCoordsByEv(ev, gSize.current.rows, gSize.current.cols, size)
         const loaderCanvas = onLoadCanvasRef.current
         if (!canvas) canvas = canvasRef.current!
         loaderCanvas!.style.top = canvas.offsetTop + 'px'
         loaderCanvas!.style.left = canvas.offsetLeft + 'px'
-        if ((!gRows && !gCols) || !loadedShape) return
-        row = row >= gRows
-            ? gRows - 1
+        if ((!gSize.current.rows && !gSize.current.cols) || !loadedShape) return
+        row = row >= gSize.current.rows
+            ? gSize.current.rows - 1
             : row < 0
                 ? 0
                 : row
-        col = col >= gCols
-            ? gCols - 1
+        col = col >= gSize.current.cols
+            ? gSize.current.cols - 1
             : col < 0
                 ? 0
                 : col
 
-        if (row === lastHoveredCell[0] && col === lastHoveredCell[1]) return
-        lastHoveredCell = [row, col]
+        if (row === lastHoveredCell.current[0] && col === lastHoveredCell.current[1]) return
+        lastHoveredCell.current = [row, col]
 
         if (shapeDropCell[0] !== -1 && shapeDropCell[1] !== -1) return
         renderPseudoVillage(row, col)
@@ -173,7 +181,7 @@ export function Board({ eventBus }: { eventBus: Function }) {
 
     function onSelectDropCell(ev: MouseEvent | TouchEvent) {
         const size = ranges.current.resolution.current
-        const { row, col } = utilService.getCoordsByEv(ev, gRows, gCols, size)
+        const { row, col } = utilService.getCoordsByEv(ev, gSize.current.rows, gSize.current.cols, size)
         shapeDropCell = [row, col]
         renderPseudoVillage(row, col)
         eventBus().emit('shapePositioned', null)
@@ -185,14 +193,15 @@ export function Board({ eventBus }: { eventBus: Function }) {
         if (!pseudoVillage) return
         village.current = boardService.mergeBoardWithPseudo(village.current, pseudoVillage)
         if (shapeNameInputRef.current?.value) shapeNameInputRef.current.value = ''
-        if (isOn.current) play()
         eventBus().emit('actionEnd', null)
+        if (isOnPriorToAction.current) play()
+        isOn.current = (isOnPriorToAction.current)
     }
 
     function play() {
         isSaveShapeMode = false
-        cornerStart = null
-        cornerEnd = null
+        cornerStart.current = null
+        cornerEnd.current = null
         shapeCorners = []
         shapeFormattedCorners = []
         selectHandler.current = onSelect
@@ -210,15 +219,22 @@ export function Board({ eventBus }: { eventBus: Function }) {
     function onCancelSave() {
         saveElementsContainer.current?.classList.toggle('show')
         eventBus().emit('actionEnd', null)
+        if (isOnPriorToAction.current && !isOn.current) play()
+        isOn.current = (isOnPriorToAction.current)
     }
 
     function onStep() {
         if (isNextGen) village.current = boardService.getNextGen(village.current)
         else {
             village.current = boardService.updateCurrGen(village.current)
-            setGenCounter(prevCounter => prevCounter+1)
+            setGenCounter(prevCounter => prevCounter + 1)
             setPopulation(boardService.getPopulation())
-            if (boardService.getIsStatic()) eventBus().emit('actionStart', { isOn: false })
+            if (boardService.getIsStatic()) {
+                eventBus().emit('actionStart', { isOn: false })
+                if (isOn.current) pause()
+                isOn.current = (false)
+                isOnPriorToAction.current = false
+            }
         }
         isNextGen = !isNextGen
         renderBoard()
@@ -233,6 +249,8 @@ export function Board({ eventBus }: { eventBus: Function }) {
         onLoadCanvasRef?.current?.classList.remove('active')
         clearCanvas(onLoadCanvasRef?.current as HTMLCanvasElement)
         eventBus().emit('actionEnd', null)
+        if (isOnPriorToAction.current && !isOn.current) play()
+        isOn.current = (isOnPriorToAction.current)
     }
 
     function clearCanvas(canvas: HTMLCanvasElement) {
@@ -250,38 +268,40 @@ export function Board({ eventBus }: { eventBus: Function }) {
         elBoardContainer = boardContainerRef.current
         ctx.current = canvas.getContext('2d') as CanvasRenderingContext2D
         if (!ctx.current) return
-        gCols = Math.floor((elBoardContainer.offsetWidth - 2 * margin) / size)
-        gRows = Math.floor((elBoardContainer.offsetHeight - 2 * margin) / size)
+        const rows = Math.floor((elBoardContainer.offsetHeight - 2 * margin) / size)
+        const cols = Math.floor((elBoardContainer.offsetWidth - 2 * margin) / size)
+        gSize.current = { cols, rows }
         if (isLoadingBoard) {
             isLoadingBoard = false
         }
-        if (!village.current) village.current = boardService.getBoard(gRows, gCols, ranges.current.population.current) as string[][]
-        else village.current = boardService.resizeBoard(village.current, [gRows, gCols])
-        canvas.width = gCols * size
-        canvas.height = gRows * size
+        if (!village.current) village.current = boardService.getBoard(rows, cols, ranges.current.population.current) as string[][]
+        else village.current = boardService.resizeBoard(village.current, [rows, cols])
+        canvas.width = cols * size
+        canvas.height = rows * size
 
         loaderCanvas.width = canvas.width
         loaderCanvas.height = canvas.height
         loaderCanvas.style.top = canvas.offsetTop + 'px'
         loaderCanvas.style.left = canvas.offsetLeft + 'px'
+
     }
 
     function renderBoard(context = ctx) {
         const size = ranges.current.resolution.current
-        let highlightRowStart = lastHoveredCell[0]
-        let highlightRowEnd = lastHoveredCell[0]
-        let highlightColStart = lastHoveredCell[1]
-        let highlightColEnd = lastHoveredCell[1]
+        let highlightRowStart = lastHoveredCell.current[0]
+        let highlightRowEnd = lastHoveredCell.current[0]
+        let highlightColStart = lastHoveredCell.current[1]
+        let highlightColEnd = lastHoveredCell.current[1]
 
-        if (cornerStart?.length && cornerEnd?.length) {
-            highlightRowStart = Math.min(cornerStart[0], cornerEnd[0])
-            highlightRowEnd = Math.max(cornerStart[0], cornerEnd[0])
-            highlightColStart = Math.min(cornerStart[1], cornerEnd[1])
-            highlightColEnd = Math.max(cornerStart[1], cornerEnd[1])
+        if (cornerStart.current?.length && cornerEnd.current?.length) {
+            highlightRowStart = Math.min(cornerStart.current[0], cornerEnd.current[0])
+            highlightRowEnd = Math.max(cornerStart.current[0], cornerEnd.current[0])
+            highlightColStart = Math.min(cornerStart.current[1], cornerEnd.current[1])
+            highlightColEnd = Math.max(cornerStart.current[1], cornerEnd.current[1])
         }
 
-        for (let row = 0; row < gRows; row++) {
-            for (let col = 0; col < gCols; col++) {
+        for (let row = 0; row < village.current.length; row++) {
+            for (let col = 0; col < village.current?.[0]?.length || 0; col++) {
                 context.current.beginPath()
                 context.current.rect(col * size, row * size, size, size)
                 context.current.fillStyle = (row >= highlightRowStart && row <= highlightRowEnd
@@ -303,12 +323,12 @@ export function Board({ eventBus }: { eventBus: Function }) {
         clearCanvas(canvas)
         const { x, y } = boardService.getIsInfiniteAxis()
         // if (loadedShape.size[0] > ROWS || loadedShape.size[1] > COLS) loadedShape = boardService.resizeShape(loadedShape, [ROWS,COLS])
-        if (!x && col + loadedShape.size[1] >= gCols) col = gCols - loadedShape.size[1] < 0 ? 0 : gCols - loadedShape.size[1]
-        if (!y && row + loadedShape.size[0] >= gRows) row = gRows - loadedShape.size[0] < 0 ? 0 : gRows - loadedShape.size[0]
-        pseudoVillage = boardService.getPseudoVillage([gRows, gCols], loadedShape, [row, col])
+        if (!x && col + loadedShape.size[1] >= gSize.current.cols) col = gSize.current.cols - loadedShape.size[1] < 0 ? 0 : gSize.current.cols - loadedShape.size[1]
+        if (!y && row + loadedShape.size[0] >= gSize.current.rows) row = gSize.current.rows - loadedShape.size[0] < 0 ? 0 : gSize.current.rows - loadedShape.size[0]
+        pseudoVillage = boardService.getPseudoVillage([gSize.current.rows, gSize.current.cols], loadedShape, [row, col])
         if (!pseudoVillage) return
-        for (let row = 0; row < gRows; row++) {
-            for (let col = 0; col < gCols; col++) {
+        for (let row = 0; row < village.current.length; row++) {
+            for (let col = 0; col < village.current?.[0]?.length; col++) {
                 ctx.beginPath()
                 ctx.rect(col * size, row * size, size, size)
                 if (pseudoVillage[row][col] === 'null') ctx.fillStyle = boardService.getCurrColor(village.current[row][col])
@@ -325,8 +345,8 @@ export function Board({ eventBus }: { eventBus: Function }) {
         const size = ranges.current.resolution.current
         const rowStart = shapeCorners[0][0] || 0
         const colStart = shapeCorners[0][1] || 0
-        const rowEnd = shapeCorners[1][0] || gRows - 1
-        const colEnd = shapeCorners[1][1] || gCols - 1
+        const rowEnd = shapeCorners[1][0] || gSize.current.rows - 1
+        const colEnd = shapeCorners[1][1] || gSize.current.cols - 1
         if (!canvas) canvas = canvasRef.current!
         if (!pseudoCanvasRef.current) return
         const pseudoCtx = pseudoCanvasRef.current.getContext('2d')
@@ -361,100 +381,123 @@ export function Board({ eventBus }: { eventBus: Function }) {
         }, 100);
     }
 
+    // gameplay listeners
     useEffect(() => {
-        calcBoardSize()
-        play()
+        const removeOnToggleInfiniteAxisListener = eventBus().on('onToggleInfiniteAxis', (axis: string) => {
+            boardService.setInfiniteProp(axis, !isInfinite[axis as keyof typeof isInfinite])
+            isInfinite[axis as keyof typeof isInfinite] = !isInfinite[axis as keyof typeof isInfinite]
+        })
 
-        return () =>{
-            removeOnChangeGameStateListener()
+        const removeOnStepListener = eventBus().on('onStep', onStep)
+
+        const removeOnSetRangedValsListener = eventBus().on('onSetRangedVal', ({ percentage, rangeFor }: { percentage: number, rangeFor: string }) => {
+            if (!ranges.current[rangeFor as keyof typeof ranges]) return
+            const { max, min } = ranges.current[rangeFor as keyof typeof ranges]
+            const range = max - min
+            const current = rangeFor !== 'population'
+                ? min + range * (100 - percentage) / 100
+                : max - range * (100 - percentage) / 100
+            ranges.current = { ...ranges.current, [rangeFor]: { min, max, current } }
+            if (rangeFor === 'resolution') {
+                calcBoardSize()
+            } else if (rangeFor === 'population') {
+                village.current = boardService.getBoard(gSize.current.rows, gSize.current.cols, current)
+                setGenCounter(1)
+            }
+            pause()
+            if (isOn.current) play()
+        })
+
+        return () => {
             removeOnToggleInfiniteAxisListener()
             removeOnStepListener()
             removeOnSetRangedValsListener()
+        }
+    }, [])
+
+    // load listeners
+    useEffect(() => {
+        const removeOnLoadShapeListener = eventBus().on('onLoadShape', onLoadShape)
+        const removeOnLoadShapePositionListener = eventBus().on('onLoadShapePosition', (state: string) => {
+            switch (state) {
+                case 'position':
+                    positionLoadedShape()
+                    break
+                case 'reposition':
+                    shapeDropCell = [-1, -1]
+                    break
+                default: onCancelLoad()
+            }
+        })
+
+        return () => {
+            removeOnLoadShapeListener()
+            removeOnLoadShapePositionListener()
+        }
+    }, [])
+
+    // save listeners
+    useEffect(() => {
+        const removeOnCancelSaveModeListener = eventBus().on('cancelSaveMode', () => {
+            if (isOnPriorToAction.current) play()
+            isOn.current = (isOnPriorToAction.current)
+            saveElementsContainer.current?.classList.remove('show')
+        })
+        const removeOnSaveShapeListener = eventBus().on('onSaveShape', onCaptureAndSave)
+        const removeOnSaveModeListener = eventBus().on('onSaveMode', (isShape: boolean) => {
+            onCancelLoad()
+            pause()
+            if (isShape) return onSaveShape()
+            cornerStart.current = [0, 0]
+            cornerEnd.current = [gSize.current.rows - 1, gSize.current.cols - 1]
+            shapeCorners = [[...cornerStart.current], [...cornerEnd.current]]
+            shapeFormattedCorners = boardService.getFormattedShapeCorners(shapeCorners, village.current)
+            snapCanvas()
+            saveElementsContainer?.current?.classList.toggle('show')
+            cornerStart.current = null
+            cornerEnd.current = null
+        })
+        return () => {
             removeOnCancelSaveModeListener()
             removeOnSaveShapeListener()
             removeOnSaveModeListener()
-            removeOnLoadShapeListener()
-            removeOnLoadShapePositionListener()
-            removeOnToggleSuperLifeListener()
-            removeOnMenuToggledListener()
-            window.removeEventListener('resize', onResize)
         }
-    })
-
-    const removeOnChangeGameStateListener = eventBus().on('onChangeGameState', ((state: { isOn: boolean } | null) => {
-        if (!state?.isOn) return pause()
-        isOn.current = state.isOn
-        return isOn.current
-            ? play()
-            : pause()
-    }))
-    const removeOnToggleInfiniteAxisListener = eventBus().on('onToggleInfiniteAxis', (axis: string) => {
-        boardService.setInfiniteProp(axis, !isInfinite[axis as keyof typeof isInfinite])
-        isInfinite[axis as keyof typeof isInfinite] = !isInfinite[axis as keyof typeof isInfinite]
-    })
-    const removeOnStepListener = eventBus().on('onStep', onStep)
-    const removeOnSetRangedValsListener = eventBus().on('onSetRangedVal', ({ percentage, rangeFor }: { percentage: number, rangeFor: string }) => {
-        if (!ranges.current[rangeFor as keyof typeof ranges]) return
-        const { max, min } = ranges.current[rangeFor as keyof typeof ranges]
-        const range = max - min
-        const current = rangeFor !== 'population'
-            ? min + range * (100 - percentage) / 100
-            : max - range * (100 - percentage) / 100
-        ranges.current = { ...ranges.current, [rangeFor]: { min, max, current } }
-        if (rangeFor === 'resolution') {
-            calcBoardSize()
-        } else if (rangeFor === 'population') village.current = boardService.getBoard(gRows, gCols, current)
-        pause()
-        if (isOn.current) play()
-    })
-
-    // shape/board listeners
-    window.addEventListener('resize', onResize )
-    function onResize(){
-        if (isOn.current) pause()
-        utilService.debounce(() => {
-            calcBoardSize()
-            if (isOn.current) play()
-        }, 300)()
-    }
-
-    const removeOnCancelSaveModeListener = eventBus().on('cancelSaveMode', () => saveElementsContainer.current?.classList.remove('show'))
-    const removeOnSaveShapeListener = eventBus().on('onSaveShape', onCaptureAndSave)
-    const removeOnSaveModeListener = eventBus().on('onSaveMode', (isShape: boolean) => {
-        onCancelLoad()
-        pause()
-        if (isShape) return onSaveShape()
-        cornerStart = [0, 0]
-        cornerEnd = [gRows - 1, gCols - 1]
-        shapeCorners = [[...cornerStart], [...cornerEnd]]
-        shapeFormattedCorners = boardService.getFormattedShapeCorners(shapeCorners, village.current)
-        snapCanvas()
-        saveElementsContainer?.current?.classList.toggle('show')
-        cornerStart = null
-        cornerEnd = null
-    })
-    const removeOnLoadShapeListener = eventBus().on('onLoadShape', onLoadShape)
-    const removeOnLoadShapePositionListener = eventBus().on('onLoadShapePosition', (state: string) => {
-        debugger
-        switch (state) {
-            case 'position':
-                positionLoadedShape()
-                break
-            case 'reposition':
-                shapeDropCell = [-1, -1]
-                break
-            default: onCancelLoad()
-        }
-    })
+    }, [])
 
     // mode listeners
-    const removeOnToggleSuperLifeListener = eventBus().on('toggleSuperLife', (state:boolean) => { isSuperMode = state })
-    const removeOnMenuToggledListener = eventBus().on('menuToggled', () => onCancelLoad())
+    useEffect(() => {
+        const removeOnToggleSuperLifeListener = eventBus().on('toggleSuperLife', (state: boolean) => { isSuperMode = state })
+        const removeOnMenuToggledListener = eventBus().on('menuToggled', onCancelLoad)
+        return () => {
+            removeOnToggleSuperLifeListener()
+            removeOnMenuToggledListener()
+        }
+    }, [])
 
+    useEffect(() => {
+        console.log('Board mounted')
+
+        window.addEventListener('resize', onResize)
+        calcBoardSize()
+        play()
+
+        return () => {
+            console.log('Board unmounted')
+            window.removeEventListener('resize', onResize)
+        }
+
+        function onResize() {
+            if (isOn.current) pause()
+            utilService.debounce(() => {
+                calcBoardSize()
+                if (isOn.current) play()
+            }, 300)()
+        }
+    }, [canvasRef?.current])
 
     return (
         <>
-            <GameHeader eventBus={eventBus} />
+            <GameHeader {...{ isOn, isOnPriorToAction, eventBus, play, pause }} />
             <section className="board-container relative flex column center" ref={boardContainerRef}>
                 <Aside eventBus={eventBus} />
                 <div className="stats">
@@ -463,10 +506,12 @@ export function Board({ eventBus }: { eventBus: Function }) {
                         <span> | Pop: {population}</span>
                     </h3>
                 </div>
-                <canvas ref={canvasRef} onMouseMove={onHover} onClick={onSelectHandler} onMouseLeave={() => {
-                    lastHoveredCell = [-1, -1]
-                    renderBoard()
-                }}></canvas>
+                <canvas ref={canvasRef} onMouseMove={onHover} onClick={onSelectHandler}
+                // onMouseLeave={() => {
+                //     lastHoveredCell.current = [-1, -1]
+                //     renderBoard()
+                // }}
+                ></canvas>
                 <canvas className="pseudo-load-canvas absolute" onMouseMove={onLoadShapeHover} onClick={onSelectDropCell} ref={onLoadCanvasRef}></canvas>
                 <div ref={saveElementsContainer} className="save-elements-container fixed" onClick={onCancelSave}>
                     <div ref={pseudoCanvasWrapperRef} className="canvas-wrapper absolute" onClick={ev => ev.stopPropagation()}>
