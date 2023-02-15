@@ -17,7 +17,7 @@ export function ShapePreview({ type, idx, shape, name, eventBus, maxWidth, gReso
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const savedShapeRef = useRef<HTMLLIElement>(null)
 
-    function onLoadShape() { eventBus().emit('onLoadShape', { shape, isBoard: type === 'board' }) }
+    function onLoadShape() { eventBus().emit('loadShape', { shape, isBoard: type === 'board' }) }
 
     function clearCanvas(canvas: HTMLCanvasElement) {
         if (!canvas) return

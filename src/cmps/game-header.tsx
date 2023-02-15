@@ -18,12 +18,13 @@ export function GameHeader({ eventBus, isOn, isOnPriorToAction, play, pause }: h
     const saveShapeFormRef = useRef(null as unknown as HTMLFormElement)
     const instructionsRef = useRef(null as unknown as HTMLParagraphElement)
     const [isShapePositioned, setIsShapePositioned] = useState(false)
+    const [isStepDisabled, setIsStepDisabled] = useState(isOn.current)
 
     let flkty: Flickity
 
     function onSubmitSavedShape(ev: FormEvent) {
         ev.preventDefault()
-        eventBus().emit('onSaveShape', { isShape: isSaveShapeMode === 'shape', name: shapeNameInputRef.current!.value || 'My shape' })
+        eventBus().emit('saveShape', { isShape: isSaveShapeMode === 'shape', name: shapeNameInputRef.current!.value || 'My shape' })
         setIsSaveShapeMode('')
         if (!flkty) signToFlickity()
         flkty.select(0)
@@ -52,7 +53,7 @@ export function GameHeader({ eventBus, isOn, isOnPriorToAction, play, pause }: h
     function onSaveShapeMode(type = 'shape') {
         if (!saveShapeFormRef?.current) return
         handleStateAnimation({ state: false })
-        eventBus().emit('onSaveMode', type === 'shape')
+        eventBus().emit('saveMode', type === 'shape')
         if (type === 'board') {
             saveShapeFormRef.current.hidden = false
             instructionsRef!.current!.hidden = true
@@ -70,6 +71,7 @@ export function GameHeader({ eventBus, isOn, isOnPriorToAction, play, pause }: h
         if (!nextState) isOnPriorToAction.current = (next)
         if (next !== isOn.current) next ? play() : pause()
         isOn.current = (next)
+        setIsStepDisabled(next)
     }
 
     function onToggleSuperLife() {
@@ -77,7 +79,7 @@ export function GameHeader({ eventBus, isOn, isOnPriorToAction, play, pause }: h
         setIsSuperLife(lastState => !lastState)
     }
 
-    function onStep() { eventBus().emit('onStep', null) }
+    function onStep() { eventBus().emit('step', null) }
 
     function signToFlickity() {
         flkty = new Flickity('.carousel', {
@@ -115,7 +117,7 @@ export function GameHeader({ eventBus, isOn, isOnPriorToAction, play, pause }: h
             instructionsRef!.current!.hidden = true
         })
         const removeOnMenuToggledListener = eventBus().on('menuToggled', () => onCancelSaveMode())
-        const removeOnLoadShapeListener = eventBus().on('onLoadShape', () => {
+        const removeOnLoadShapeListener = eventBus().on('loadShape', () => {
             if (!flkty) signToFlickity()
             flkty.select(2)
         })
@@ -166,7 +168,7 @@ export function GameHeader({ eventBus, isOn, isOnPriorToAction, play, pause }: h
                                         begin="indefinite"
                                     /></svg>
                             </button>
-                            <button className="flex center controller" disabled={isOn.current} onClick={onStep}>
+                            <button className="flex center controller" disabled={isStepDisabled} onClick={onStep}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="currentColor" d="M16 8a2 2 0 1 1 0 4a2 2 0 0 1 0-4ZM2 10a.5.5 0 0 1 .5-.5h7.793L7.146 6.354a.5.5 0 1 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708l3.147-3.146H2.5A.5.5 0 0 1 2 10Z" /></svg>
                             </button>
                             <button className={`flex center superlife controller ${isSuperLife ? 'active' : ''} `} onClick={onToggleSuperLife}>
@@ -177,7 +179,7 @@ export function GameHeader({ eventBus, isOn, isOnPriorToAction, play, pause }: h
                             <button className="wide flex center capitalize" onClick={() => onSaveShapeMode('shape')}><span>Save shape</span></button>
                             <button className="wide flex center capitalize" onClick={() => onSaveShapeMode('board')}><span>Save board</span></button>
                             <button className="wide flex center" onClick={() => {
-                                eventBus().emit('onSetRangedVal', { percentage: 0, rangeFor: 'population' })
+                                eventBus().emit('setRangedVal', { percentage: 0, rangeFor: 'population' })
                                 onTogglePlayPause({ isOn: false })
                             }}><span>Clear</span></button>
                         </nav>
@@ -206,13 +208,13 @@ export function GameHeader({ eventBus, isOn, isOnPriorToAction, play, pause }: h
                     <div className="gallery-cell">
                         <div className="load-header main-layout">
                             <div className="confirm-load">
-                                <button className={`submit-button ${isShapePositioned ? 'positioned' : ''}`} onClick={() => eventBus().emit('onLoadShapePosition', 'position')}>Place here</button>
+                                <button className={`submit-button ${isShapePositioned ? 'positioned' : ''}`} onClick={() => eventBus().emit('loadShapePosition', 'position')}>Place here</button>
                                 <button className="submit-button" onClick={() => {
                                     setIsShapePositioned(false)
-                                    eventBus().emit('onLoadShapePosition', 'reposition')
+                                    eventBus().emit('loadShapePosition', 'reposition')
                                 }}>New position</button>
                             </div>
-                            <button className="cancel-button absolute" onClick={() => eventBus().emit('onLoadShapePosition', 'cancel')}>
+                            <button className="cancel-button absolute" onClick={() => eventBus().emit('loadShapePosition', 'cancel')}>
                                 <svg className="flex center" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M208.5 191.5a12 12 0 0 1 0 17a12.1 12.1 0 0 1-17 0L128 145l-63.5 63.5a12.1 12.1 0 0 1-17 0a12 12 0 0 1 0-17L111 128L47.5 64.5a12 12 0 0 1 17-17L128 111l63.5-63.5a12 12 0 0 1 17 17L145 128Z" /></svg>
                             </button>
                         </div>
@@ -249,7 +251,7 @@ export function GameHeader({ eventBus, isOn, isOnPriorToAction, play, pause }: h
                             />
                         </svg>
                     </button>
-                    <button className="flex center controller" disabled={isOn.current} onClick={onStep} title="One Step forward">
+                    <button className="flex center controller" disabled={isStepDisabled} onClick={onStep} title="One Step forward">
                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="currentColor" d="M16 8a2 2 0 1 1 0 4a2 2 0 0 1 0-4ZM2 10a.5.5 0 0 1 .5-.5h7.793L7.146 6.354a.5.5 0 1 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708l3.147-3.146H2.5A.5.5 0 0 1 2 10Z" /></svg>
                     </button>
                     <button className={`flex center controller superlife ${isSuperLife ? 'active' : ''} `} onClick={onToggleSuperLife} title="Superlife Mode">
@@ -268,7 +270,7 @@ export function GameHeader({ eventBus, isOn, isOnPriorToAction, play, pause }: h
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1.3em" height="1.3em" viewBox="0 0 36 36"><path fill="currentColor" d="m18 19.84l6.38-6.35A1 1 0 1 0 23 12.08L19 16V4a1 1 0 1 0-2 0v12l-4-3.95a1 1 0 0 0-1.41 1.42Z" className="clr-i-solid clr-i-solid-path-1" /><path fill="currentColor" d="m19.41 21.26l-.74.74h15.26c-.17-.57-.79-2.31-3.09-8.63A1.94 1.94 0 0 0 28.93 12h-2.38a3 3 0 0 1-.76 2.92Z" className="clr-i-solid clr-i-solid-path-2" /><path fill="currentColor" d="m16.58 21.26l-6.38-6.35A3 3 0 0 1 9.44 12H7.07a1.92 1.92 0 0 0-1.9 1.32c-2.31 6.36-2.93 8.11-3.1 8.68h15.26Z" className="clr-i-solid clr-i-solid-path-3" /><path fill="currentColor" d="M2 24v6a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2v-6Zm28 4h-4v-2h4Z" className="clr-i-solid clr-i-solid-path-4" /><path fill="none" d="M0 0h36v36H0z" /></svg>
                             </button>
                             <button className="flex center" onClick={() => {
-                                eventBus().emit('onSetRangedVal', { percentage: 0, rangeFor: 'population' })
+                                eventBus().emit('setRangedVal', { percentage: 0, rangeFor: 'population' })
                                 onTogglePlayPause({ isOn: false })
                             }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1.3em" height="1.3em" viewBox="0 0 32 32"><path fill="currentColor" d="M26 20h-6v-2h6zm4 8h-6v-2h6zm-2-4h-6v-2h6z" /><path fill="currentColor" d="M17.003 20a4.895 4.895 0 0 0-2.404-4.173L22 3l-1.73-1l-7.577 13.126a5.699 5.699 0 0 0-5.243 1.503C3.706 20.24 3.996 28.682 4.01 29.04a1 1 0 0 0 1 .96h14.991a1 1 0 0 0 .6-1.8c-3.54-2.656-3.598-8.146-3.598-8.2Zm-5.073-3.003A3.11 3.11 0 0 1 15.004 20c0 .038.002.208.017.469l-5.9-2.624a3.8 3.8 0 0 1 2.809-.848ZM15.45 28A5.2 5.2 0 0 1 14 25h-2a6.5 6.5 0 0 0 .968 3h-2.223A16.617 16.617 0 0 1 10 24H8a17.342 17.342 0 0 0 .665 4H6c.031-1.836.29-5.892 1.803-8.553l7.533 3.35A13.025 13.025 0 0 0 17.596 28Z" /></svg>
@@ -298,17 +300,17 @@ export function GameHeader({ eventBus, isOn, isOnPriorToAction, play, pause }: h
                     <div className="gallery-cell">
                         <div className="load-header main-layout">
                             <div className="confirm-load">
-                                <button className={`submit-button ${isShapePositioned ? 'positioned' : ''}`} onClick={() => eventBus().emit('onLoadShapePosition', 'position')}>
+                                <button className={`submit-button ${isShapePositioned ? 'positioned' : ''}`} onClick={() => eventBus().emit('loadShapePosition', 'position')}>
                                     <svg className="flex center" xmlns="http://www.w3.org/2000/svg" width="1.3em" height="1.3em" viewBox="0 0 24 24"><path fill="currentColor" fillRule="evenodd" d="M19 12.87c0-.47-.34-.85-.8-.98A2.997 2.997 0 0 1 16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.38-.93 2.54-2.2 2.89c-.46.13-.8.51-.8.98V13c0 .55.45 1 1 1h4.98l.02 7c0 .55.45 1 1 1s1-.45 1-1l-.02-7H18c.55 0 1-.45 1-1v-.13z" /></svg>
                                 </button>
                                 <button className="submit-button" onClick={() => {
                                     setIsShapePositioned(false)
-                                    eventBus().emit('onLoadShapePosition', 'reposition')
+                                    eventBus().emit('loadShapePosition', 'reposition')
                                 }}>
                                     <svg className="flex center" xmlns="http://www.w3.org/2000/svg" width="1.3em" height="1.3em" viewBox="0 0 24 24"><path fill="currentColor" d="m9 9l7 7h-3v4l-1 3l-1-3v-4H7a1 1 0 0 1-1-1v-1.586a1 1 0 0 1 .293-.707L9 10V9zm7-7a1 1 0 0 1 1 1v.382a1 1 0 0 1-.553.894L15 5v5l2.707 2.707a1 1 0 0 1 .293.707V15a.997.997 0 0 1-.076.383L12.27 9.73L9 6.46V5l-1.447-.724A1 1 0 0 1 7 3.382V3a1 1 0 0 1 1-1h8z" /><path fill="currentColor" d="M1.635 2.905a.9.9 0 0 0 0 1.27l18.19 18.19a.898.898 0 0 0 1.27-1.27L11 11L2.905 2.905a.898.898 0 0 0-1.27 0z" /></svg>
                                 </button>
                             </div>
-                            <button className="cancel-button absolute" onClick={() => eventBus().emit('onLoadShapePosition', 'cancel')} >
+                            <button className="cancel-button absolute" onClick={() => eventBus().emit('loadShapePosition', 'cancel')} >
                                 <svg className="flex center" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M208.5 191.5a12 12 0 0 1 0 17a12.1 12.1 0 0 1-17 0L128 145l-63.5 63.5a12.1 12.1 0 0 1-17 0a12 12 0 0 1 0-17L111 128L47.5 64.5a12 12 0 0 1 17-17L128 111l63.5-63.5a12 12 0 0 1 17 17L145 128Z" /></svg>
                             </button>
                         </div>

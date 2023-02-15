@@ -36,12 +36,12 @@ export function Aside({ eventBus }: { eventBus: Function }) {
 
     function onToggleInfiniteAxis(axis: string) {
         setIsInfiniteAxis({ ...isInfiniteAxis, [axis]: !isInfiniteAxis[axis as keyof typeof isInfiniteAxis] })
-        eventBus().emit('onToggleInfiniteAxis', axis)
+        eventBus().emit('toggleInfiniteAxis', axis)
     }
 
     function onSetRange(type: string) {
         const percentage = +rangeInputRefs.current[type as keyof typeof rangeInputRefs.current].value
-        eventBus().emit('onSetRangedVal', { percentage, rangeFor: type })
+        eventBus().emit('setRangedVal', { percentage, rangeFor: type })
         setRangeVals({ ...rangeVals, [type]: percentage })
     }
 
@@ -65,9 +65,9 @@ export function Aside({ eventBus }: { eventBus: Function }) {
     }
 
     useEffect(() => {
-        const removeOnSaveListener = eventBus().on('onSaveEvent', onLoadShapes)
-        const removeOnSaveModeListener = eventBus().on('onSaveMode', () => setIsMenuActive(false))
-        const removeOnLoadListener = eventBus().on('onLoadShape', () => setIsMenuActive(false))
+        const removeOnSaveListener = eventBus().on('saveEvent', onLoadShapes)
+        const removeOnSaveModeListener = eventBus().on('saveMode', () => setIsMenuActive(false))
+        const removeOnLoadListener = eventBus().on('loadShape', () => setIsMenuActive(false))
         const removeOnReloadShapesListener = eventBus().on('reloadShapes', (type?: string) => {
             if (type) setShapes(prevShapes => ({ ...prevShapes, [type]: boardService.loadShapesFromStorage(type) }))
             else setShapes({

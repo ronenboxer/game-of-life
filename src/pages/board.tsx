@@ -384,14 +384,14 @@ export function Board({ eventBus }: { eventBus: Function }) {
 
     // gameplay listeners
     useEffect(() => {
-        const removeOnToggleInfiniteAxisListener = eventBus().on('onToggleInfiniteAxis', (axis: string) => {
+        const removeOnToggleInfiniteAxisListener = eventBus().on('toggleInfiniteAxis', (axis: string) => {
             boardService.setInfiniteProp(axis, !isInfinite[axis as keyof typeof isInfinite])
             isInfinite[axis as keyof typeof isInfinite] = !isInfinite[axis as keyof typeof isInfinite]
         })
 
-        const removeOnStepListener = eventBus().on('onStep', onStep)
+        const removeOnStepListener = eventBus().on('step', onStep)
 
-        const removeOnSetRangedValsListener = eventBus().on('onSetRangedVal', ({ percentage, rangeFor }: { percentage: number, rangeFor: string }) => {
+        const removeOnSetRangedValsListener = eventBus().on('setRangedVal', ({ percentage, rangeFor }: { percentage: number, rangeFor: string }) => {
             if (!ranges.current[rangeFor as keyof typeof ranges.current]) return
             const { max, min } = ranges.current[rangeFor as keyof typeof ranges.current]
             const range = max - min
@@ -404,6 +404,7 @@ export function Board({ eventBus }: { eventBus: Function }) {
             } else if (rangeFor === 'population') {
                 village.current = boardService.getBoard(gSize.current.rows, gSize.current.cols, current)
                 setGenCounter(1)
+                setPopulation(boardService.getPopulation())
             }
             renderBoard()
             pause()
@@ -419,8 +420,8 @@ export function Board({ eventBus }: { eventBus: Function }) {
 
     // load listeners
     useEffect(() => {
-        const removeOnLoadShapeListener = eventBus().on('onLoadShape', onLoadShape)
-        const removeOnLoadShapePositionListener = eventBus().on('onLoadShapePosition', (state: string) => {
+        const removeOnLoadShapeListener = eventBus().on('loadShape', onLoadShape)
+        const removeOnLoadShapePositionListener = eventBus().on('loadShapePosition', (state: string) => {
             switch (state) {
                 case 'position':
                     positionLoadedShape()
@@ -455,8 +456,8 @@ export function Board({ eventBus }: { eventBus: Function }) {
             // if (pseudoCanvas) pseudoCanvas.getContext('2d')!.clearRect(0, 0, pseudoCanvas.width, pseudoCanvas.height)
             renderBoard()
         })
-        const removeOnSaveShapeListener = eventBus().on('onSaveShape', onCaptureAndSave)
-        const removeOnSaveModeListener = eventBus().on('onSaveMode', (isShape: boolean) => {
+        const removeOnSaveShapeListener = eventBus().on('saveShape', onCaptureAndSave)
+        const removeOnSaveModeListener = eventBus().on('saveMode', (isShape: boolean) => {
             onCancelLoad()
             pause()
             if (isShape) return onSaveShape()
@@ -503,6 +504,7 @@ export function Board({ eventBus }: { eventBus: Function }) {
             if (isOn.current) pause()
             utilService.debounce(() => {
                 calcBoardSize()
+                renderBoard()
                 if (isOn.current) play()
             }, 300)()
         }

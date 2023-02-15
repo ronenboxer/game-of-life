@@ -30,7 +30,7 @@ export function ShapeList({ type, shapes, onTransformShape, eventBus, gResolutio
 
     useEffect(() => {
         const removeOnMenuToggledListener = eventBus().on('menuToggled', () => shapeListRef.current?.classList.remove('expanded'))
-        
+        const removeOnShapeLoadListener = eventBus().on('loadShape', () => shapeListRef.current?.classList.remove('expanded'))
         return () => {
             removeOnMenuToggledListener()
         }
