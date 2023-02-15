@@ -24,7 +24,7 @@ export function Board({ eventBus }: { eventBus: Function }) {
     // board props
     const isInfinite = { x: true, y: true }
     const gSize = useRef({ rows: 0, cols: 0 })
-    let village = useRef(null as unknown as string[][])
+    const village = useRef(null as unknown as string[][])
     const lastHoveredCell = useRef([-1, -1])
     const margin = 12
 
@@ -40,24 +40,24 @@ export function Board({ eventBus }: { eventBus: Function }) {
     const [genCounter, setGenCounter] = useState(1)
     const [population, setPopulation] = useState(0)
     const selectHandler = useRef(onSelect)
-    let isNextGen = true
-    let intervalId = useRef(null as unknown as string | number | NodeJS.Timer | undefined)
-    let loadedShape: Shape | null = null
-    let pseudoVillage: string[][] | null = null
+    const loadedShape = useRef<Shape | null>()
+    const isNextGen = useRef(true)
+    const intervalId = useRef(null as unknown as string | number | NodeJS.Timer | undefined)
+    const pseudoVillage = useRef<string[][] | null>(null)
 
     // shape cell selection
-    let shapeFormattedCorners = [] as number[][]
-    let shapeCorners = [] as number[][]
+    const shapeFormattedCorners = useRef([] as number[][])
+    const shapeCorners = useRef([] as number[][])
     const cornerStart = useRef<null | number[]>(null)
     const cornerEnd = useRef<null | number[]>(null)
-    let shapeDropCell = [-1, -1]
+    const shapeDropCell = useRef([-1, -1])
 
     // modes props
     const isOn = useRef(true)
     const isOnPriorToAction = useRef(true)
-    let isSaveShapeMode = false
-    let isSuperMode = false
-    let isLoadingBoard = true
+    const isSaveShapeMode = useRef(false)
+    const isSuperMode = useRef(false)
+    const isLoadingBoard = useRef(true)
 
     function onSelectHandler(ev: MouseEvent | TouchEvent) {
         selectHandler.current(ev)
@@ -71,7 +71,7 @@ export function Board({ eventBus }: { eventBus: Function }) {
 
         const currState = village.current[row][col]
 
-        if (isSuperMode) village.current[row][col] = currState === 'super' ? 'dead' : 'super'
+        if (isSuperMode.current) village.current[row][col] = currState === 'super' ? 'dead' : 'super'
         else {
             if (currState === 'super') return
             village.current[row][col] = currState === 'dying' || currState === 'dead'
@@ -100,11 +100,12 @@ export function Board({ eventBus }: { eventBus: Function }) {
         selectHandler.current = onSelectCorners
         cornerStart.current = null
         cornerEnd.current = null
-        isSaveShapeMode = true
+        isSaveShapeMode.current = true
     }
 
     function onCaptureAndSave({ isShape, name } = { isShape: true, name: 'My Shape' }) {
-        boardService.saveShape(shapeFormattedCorners, village.current, name, isShape)
+        boardService.saveShape(shapeFormattedCorners.current, village.current, name, isShape)
+        shapeFormattedCorners.current = []
         pseudoCanvasWrapperRef.current?.classList.toggle('done')
         canvasCoverRef.current?.classList.toggle('show')
         setTimeout(() => {
@@ -120,17 +121,17 @@ export function Board({ eventBus }: { eventBus: Function }) {
     }
 
     function onSelectCorners(ev: MouseEvent | TouchEvent) {
-        if (!isSaveShapeMode) return
+        if (!isSaveShapeMode.current) return
         const size = ranges.current.resolution.current
         const { row, col } = utilService.getCoordsByEv(ev, gSize.current.rows, gSize.current.cols, size)
         if (!cornerStart.current) cornerStart.current = [row, col]
         else {
-            shapeCorners = [[...cornerStart.current], [row, col]]
-            shapeFormattedCorners = boardService.getFormattedShapeCorners(shapeCorners, village.current)
+            shapeCorners.current = [[...cornerStart.current], [row, col]]
+            shapeFormattedCorners.current = boardService.getFormattedShapeCorners(shapeCorners.current, village.current)
             cornerStart.current = null
             cornerEnd.current = null
 
-            if (shapeFormattedCorners.length) {
+            if (shapeFormattedCorners.current.length) {
                 snapCanvas()
                 eventBus().emit('cornersSelected', null)
                 saveElementsContainer?.current?.classList.toggle('show')
@@ -147,8 +148,8 @@ export function Board({ eventBus }: { eventBus: Function }) {
         eventBus().emit('actionStart', null)
         if (isOn.current) pause()
         isOn.current = (false)
-        loadedShape = shape
-        if (isBoard) isLoadingBoard = true
+        loadedShape.current = shape
+        if (isBoard) isLoadingBoard.current = true
         selectHandler.current = (ev: MouseEvent | TouchEvent) => { }
         onLoadCanvasRef?.current?.classList.add('active')
     }
@@ -160,7 +161,7 @@ export function Board({ eventBus }: { eventBus: Function }) {
         if (!canvas) canvas = canvasRef.current!
         loaderCanvas!.style.top = canvas.offsetTop + 'px'
         loaderCanvas!.style.left = canvas.offsetLeft + 'px'
-        if ((!gSize.current.rows && !gSize.current.cols) || !loadedShape) return
+        if ((!gSize.current.rows && !gSize.current.cols) || !loadedShape.current) return
         row = row >= gSize.current.rows
             ? gSize.current.rows - 1
             : row < 0
@@ -175,14 +176,14 @@ export function Board({ eventBus }: { eventBus: Function }) {
         if (row === lastHoveredCell.current[0] && col === lastHoveredCell.current[1]) return
         lastHoveredCell.current = [row, col]
 
-        if (shapeDropCell[0] !== -1 && shapeDropCell[1] !== -1) return
+        if (shapeDropCell.current[0] !== -1 && shapeDropCell.current[1] !== -1) return
         renderPseudoVillage(row, col)
     }
 
     function onSelectDropCell(ev: MouseEvent | TouchEvent) {
         const size = ranges.current.resolution.current
         const { row, col } = utilService.getCoordsByEv(ev, gSize.current.rows, gSize.current.cols, size)
-        shapeDropCell = [row, col]
+        shapeDropCell.current = [row, col]
         renderPseudoVillage(row, col)
         eventBus().emit('shapePositioned', null)
     }
@@ -190,8 +191,8 @@ export function Board({ eventBus }: { eventBus: Function }) {
     function positionLoadedShape() {
         onLoadCanvasRef?.current?.classList.remove('active')
         clearCanvas(onLoadCanvasRef?.current as HTMLCanvasElement)
-        if (!pseudoVillage) return
-        village.current = boardService.mergeBoardWithPseudo(village.current, pseudoVillage)
+        if (!pseudoVillage.current) return
+        village.current = boardService.mergeBoardWithPseudo(village.current, pseudoVillage.current)
         if (shapeNameInputRef.current?.value) shapeNameInputRef.current.value = ''
         eventBus().emit('actionEnd', null)
         if (isOnPriorToAction.current) play()
@@ -199,14 +200,14 @@ export function Board({ eventBus }: { eventBus: Function }) {
     }
 
     function play() {
-        isSaveShapeMode = false
+        isSaveShapeMode.current = false
         cornerStart.current = null
         cornerEnd.current = null
-        shapeCorners = []
-        shapeFormattedCorners = []
+        shapeCorners.current = []
+        shapeFormattedCorners.current = []
         selectHandler.current = onSelect
-        loadedShape = null
-        pseudoVillage = null
+        loadedShape.current = null
+        pseudoVillage.current = null
         renderBoard()
         clearInterval(intervalId.current)
         intervalId.current = setInterval(onStep, ranges.current.speed.current)
@@ -224,7 +225,7 @@ export function Board({ eventBus }: { eventBus: Function }) {
     }
 
     function onStep() {
-        if (isNextGen) village.current = boardService.getNextGen(village.current)
+        if (isNextGen.current) village.current = boardService.getNextGen(village.current)
         else {
             village.current = boardService.updateCurrGen(village.current)
             setGenCounter(prevCounter => prevCounter + 1)
@@ -236,15 +237,15 @@ export function Board({ eventBus }: { eventBus: Function }) {
                 isOnPriorToAction.current = false
             }
         }
-        isNextGen = !isNextGen
+        isNextGen.current = !isNextGen.current
         renderBoard()
     }
 
     function onCancelLoad() {
-        loadedShape = null
-        pseudoVillage = null
-        shapeDropCell = [-1, -1]
-        isLoadingBoard = false
+        loadedShape.current = null
+        pseudoVillage.current = null
+        shapeDropCell.current = [-1, -1]
+        isLoadingBoard.current = false
         selectHandler.current = onSelect
         onLoadCanvasRef?.current?.classList.remove('active')
         clearCanvas(onLoadCanvasRef?.current as HTMLCanvasElement)
@@ -271,8 +272,8 @@ export function Board({ eventBus }: { eventBus: Function }) {
         const rows = Math.floor((elBoardContainer.offsetHeight - 2 * margin) / size)
         const cols = Math.floor((elBoardContainer.offsetWidth - 2 * margin) / size)
         gSize.current = { cols, rows }
-        if (isLoadingBoard) {
-            isLoadingBoard = false
+        if (isLoadingBoard.current) {
+            isLoadingBoard.current = false
         }
         if (!village.current) village.current = boardService.getBoard(rows, cols, ranges.current.population.current) as string[][]
         else village.current = boardService.resizeBoard(village.current, [rows, cols])
@@ -316,23 +317,23 @@ export function Board({ eventBus }: { eventBus: Function }) {
     }
 
     function renderPseudoVillage(row: number, col: number) {
-        if (!loadedShape) return
+        if (!loadedShape.current) return
         const size = ranges.current.resolution.current
         const ctx = onLoadCanvasRef.current!.getContext('2d')!
         clearCanvas(onLoadCanvasRef.current as HTMLCanvasElement)
         clearCanvas(canvas)
         const { x, y } = boardService.getIsInfiniteAxis()
-        // if (loadedShape.size[0] > ROWS || loadedShape.size[1] > COLS) loadedShape = boardService.resizeShape(loadedShape, [ROWS,COLS])
-        if (!x && col + loadedShape.size[1] >= gSize.current.cols) col = gSize.current.cols - loadedShape.size[1] < 0 ? 0 : gSize.current.cols - loadedShape.size[1]
-        if (!y && row + loadedShape.size[0] >= gSize.current.rows) row = gSize.current.rows - loadedShape.size[0] < 0 ? 0 : gSize.current.rows - loadedShape.size[0]
-        pseudoVillage = boardService.getPseudoVillage([gSize.current.rows, gSize.current.cols], loadedShape, [row, col])
-        if (!pseudoVillage) return
+        // if (loadedShape.current.size[0] > ROWS || loadedShape.current.size[1] > COLS) loadedShape.current = boardService.resizeShape(loadedShape.current, [ROWS,COLS])
+        if (!x && col + loadedShape.current.size[1] >= gSize.current.cols) col = gSize.current.cols - loadedShape.current.size[1] < 0 ? 0 : gSize.current.cols - loadedShape.current.size[1]
+        if (!y && row + loadedShape.current.size[0] >= gSize.current.rows) row = gSize.current.rows - loadedShape.current.size[0] < 0 ? 0 : gSize.current.rows - loadedShape.current.size[0]
+        pseudoVillage.current = boardService.getPseudoVillage([gSize.current.rows, gSize.current.cols], loadedShape.current, [row, col])
+        if (!pseudoVillage.current) return
         for (let row = 0; row < village.current.length; row++) {
             for (let col = 0; col < village.current?.[0]?.length; col++) {
                 ctx.beginPath()
                 ctx.rect(col * size, row * size, size, size)
-                if (pseudoVillage[row][col] === 'null') ctx.fillStyle = boardService.getCurrColor(village.current[row][col])
-                else ctx.fillStyle = boardService.lighten(pseudoVillage[row][col])
+                if (pseudoVillage.current[row][col] === 'null') ctx.fillStyle = boardService.getCurrColor(village.current[row][col])
+                else ctx.fillStyle = boardService.lighten(pseudoVillage.current[row][col])
                 ctx.lineWidth = .5
                 ctx.stroke()
                 ctx.fill()
@@ -343,10 +344,10 @@ export function Board({ eventBus }: { eventBus: Function }) {
     function snapCanvas() {
 
         const size = ranges.current.resolution.current
-        const rowStart = shapeCorners[0][0] || 0
-        const colStart = shapeCorners[0][1] || 0
-        const rowEnd = shapeCorners[1][0] || gSize.current.rows - 1
-        const colEnd = shapeCorners[1][1] || gSize.current.cols - 1
+        const rowStart = shapeCorners.current[0][0] || 0
+        const colStart = shapeCorners.current[0][1] || 0
+        const rowEnd = shapeCorners.current[1][0] || gSize.current.rows - 1
+        const colEnd = shapeCorners.current[1][1] || gSize.current.cols - 1
         if (!canvas) canvas = canvasRef.current!
         if (!pseudoCanvasRef.current) return
         const pseudoCtx = pseudoCanvasRef.current.getContext('2d')
@@ -391,8 +392,8 @@ export function Board({ eventBus }: { eventBus: Function }) {
         const removeOnStepListener = eventBus().on('onStep', onStep)
 
         const removeOnSetRangedValsListener = eventBus().on('onSetRangedVal', ({ percentage, rangeFor }: { percentage: number, rangeFor: string }) => {
-            if (!ranges.current[rangeFor as keyof typeof ranges]) return
-            const { max, min } = ranges.current[rangeFor as keyof typeof ranges]
+            if (!ranges.current[rangeFor as keyof typeof ranges.current]) return
+            const { max, min } = ranges.current[rangeFor as keyof typeof ranges.current]
             const range = max - min
             const current = rangeFor !== 'population'
                 ? min + range * (100 - percentage) / 100
@@ -404,6 +405,7 @@ export function Board({ eventBus }: { eventBus: Function }) {
                 village.current = boardService.getBoard(gSize.current.rows, gSize.current.cols, current)
                 setGenCounter(1)
             }
+            renderBoard()
             pause()
             if (isOn.current) play()
         })
@@ -422,11 +424,14 @@ export function Board({ eventBus }: { eventBus: Function }) {
             switch (state) {
                 case 'position':
                     positionLoadedShape()
+                    renderBoard(ctx)
                     break
                 case 'reposition':
-                    shapeDropCell = [-1, -1]
+                    shapeDropCell.current = [-1, -1]
                     break
-                default: onCancelLoad()
+                default:
+                    onCancelLoad()
+                    renderBoard(ctx)
             }
         })
 
@@ -439,9 +444,16 @@ export function Board({ eventBus }: { eventBus: Function }) {
     // save listeners
     useEffect(() => {
         const removeOnCancelSaveModeListener = eventBus().on('cancelSaveMode', () => {
+            shapeFormattedCorners.current = []
+            cornerStart.current = null
+            cornerEnd.current = null
+            selectHandler.current = onSelect
             if (isOnPriorToAction.current) play()
             isOn.current = (isOnPriorToAction.current)
             saveElementsContainer.current?.classList.remove('show')
+            // const pseudoCanvas = pseudoCanvasRef.current
+            // if (pseudoCanvas) pseudoCanvas.getContext('2d')!.clearRect(0, 0, pseudoCanvas.width, pseudoCanvas.height)
+            renderBoard()
         })
         const removeOnSaveShapeListener = eventBus().on('onSaveShape', onCaptureAndSave)
         const removeOnSaveModeListener = eventBus().on('onSaveMode', (isShape: boolean) => {
@@ -450,12 +462,13 @@ export function Board({ eventBus }: { eventBus: Function }) {
             if (isShape) return onSaveShape()
             cornerStart.current = [0, 0]
             cornerEnd.current = [gSize.current.rows - 1, gSize.current.cols - 1]
-            shapeCorners = [[...cornerStart.current], [...cornerEnd.current]]
-            shapeFormattedCorners = boardService.getFormattedShapeCorners(shapeCorners, village.current)
+            shapeCorners.current = [[...cornerStart.current], [...cornerEnd.current]]
+            shapeFormattedCorners.current = boardService.getFormattedShapeCorners(shapeCorners.current, village.current)
             snapCanvas()
             saveElementsContainer?.current?.classList.toggle('show')
             cornerStart.current = null
             cornerEnd.current = null
+            shapeFormattedCorners.current = []
         })
         return () => {
             removeOnCancelSaveModeListener()
@@ -466,7 +479,7 @@ export function Board({ eventBus }: { eventBus: Function }) {
 
     // mode listeners
     useEffect(() => {
-        const removeOnToggleSuperLifeListener = eventBus().on('toggleSuperLife', (state: boolean) => { isSuperMode = state })
+        const removeOnToggleSuperLifeListener = eventBus().on('toggleSuperLife', (state: boolean) => { isSuperMode.current = state })
         const removeOnMenuToggledListener = eventBus().on('menuToggled', onCancelLoad)
         return () => {
             removeOnToggleSuperLifeListener()
