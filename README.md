@@ -1,6 +1,7 @@
 # Game of life
 
 This project was inspired by John Conway's AWESOME game of life.
+<a href="https://ronenboxer.github.io/game-of-life" target="_blank">Play here</a>
 
 ## Rules
 This is a board game in which each cell can either live or die.
